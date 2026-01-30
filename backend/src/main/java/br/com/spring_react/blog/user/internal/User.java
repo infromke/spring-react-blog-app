@@ -44,9 +44,9 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String slug;
 
-    @Enumerated(EnumType.STRING) // salva como "USER" ou "ADMIN" no banco
+    @Enumerated(EnumType.STRING) // pode ser "USER" ou "ADMIN"
     @Column(nullable = false)
-    private UserRole role;
+    private UserRole role = UserRole.USER; // o padrão é "USER"
 
     @Column(name = "created_at", updatable = false)
     @Setter(AccessLevel.NONE)
@@ -116,11 +116,6 @@ public class User implements UserDetails {
         if (this.avatar == null || this.avatar.isEmpty()) {
             String firstName = name.split(" ")[0];
             this.avatar = "https://ui-avatars.com/api/?name=" + firstName + "&background=random";
-        }
-
-        // atribui USER como role padrão caso o contrário não tenha sido especificado
-        if (this.role == null) {
-            this.role = UserRole.USER;
         }
     }
 
