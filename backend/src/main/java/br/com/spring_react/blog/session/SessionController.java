@@ -1,6 +1,10 @@
 package br.com.spring_react.blog.session;
 
 import br.com.spring_react.blog.user.MessageResponse;
+import br.com.spring_react.blog.user.UserDTO;
+import br.com.spring_react.blog.user.UserService;
+import br.com.spring_react.blog.user.internal.User;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -9,14 +13,41 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/sessions")
 public class SessionController {
 
     private final SessionService sessionService;
+    private final UserService userService;
 
-    public SessionController(SessionService sessionService) {
+    public SessionController(SessionService sessionService, UserService userService) {
         this.sessionService = sessionService;
+        this.userService = userService;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Object> me(HttpServletRequest request) {
+        String userId = (String) request.getAttribute("userId"); // recupera o ID do usuário
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse("User " +
+                    "not authenticated."));
+        }
+
+        // busca pelo usuário
+        User user = userService.findById(UUID.fromString(userId));
+
+        // retorna dados do usuário logado
+        return ResponseEntity.ok(new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getAvatar(),
+                user.getSlug(),
+                user.getRole()
+        ));
     }
 
     @PostMapping("/login")

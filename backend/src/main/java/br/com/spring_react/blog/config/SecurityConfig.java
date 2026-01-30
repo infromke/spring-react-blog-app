@@ -36,6 +36,7 @@ public class SecurityConfig {
                         // rotas privadas (precisa estar logado)
                         .requestMatchers(HttpMethod.PATCH, "/users/{id}").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/sessions/me").authenticated()
                         .requestMatchers(HttpMethod.POST, "/sessions/logout").authenticated()
 
                         .anyRequest().authenticated() // tudo mais precisa de login, por enquanto
