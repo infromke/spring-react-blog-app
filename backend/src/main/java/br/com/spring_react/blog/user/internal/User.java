@@ -4,8 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.jspecify.annotations.NonNull;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -15,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,6 +55,51 @@ public class User {
     @Column(name = "updated_at")
     @Setter(AccessLevel.NONE)
     private LocalDateTime updatedAt;
+
+    @Override
+    @NonNull
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // o role ADMIN tem permissão de ADMIN e de USER
+        if (this.role == UserRole.ADMIN) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+        }
+        // o role USER possui apenas permissão de USER
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
+    @Override
+    @NonNull
+    public String getUsername() {
+        return email; // o campo "email" é usado como "username" para identificação
+    }
+
+    @Override
+    public String getPassword() {
+        return password; // aponta para onde a senha criptografada está guardada
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // define que qualquer conta criada é permanente e não expira
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // define que as contas não possuem travas de acesso
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // define que a senha do usuário não expira então não é necessário trocá-la
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // define que todos os usuário que estão no banco estão ativos
+    }
 
     @PrePersist
     protected void onCreate() {
