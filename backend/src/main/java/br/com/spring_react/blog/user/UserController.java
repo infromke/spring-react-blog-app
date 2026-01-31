@@ -38,70 +38,46 @@ public class UserController {
 
     @GetMapping("/{id}") // GET /users/id
     public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
-        try {
-            User user = userService.findById(id);
+        User user = userService.findById(id);
 
-            return ResponseEntity.ok(new UserDTO(user.getId(), user.getName(), user.getEmail(),
-                    user.getAvatar(), user.getSlug(), user.getRole()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(e.getMessage()));
-        }
+        return ResponseEntity.ok(new UserDTO(user.getId(), user.getName(), user.getEmail(),
+                user.getAvatar(), user.getSlug(), user.getRole()));
     }
 
     @GetMapping("/profile/{slug}") // GET /users/profile/slug
     public ResponseEntity<Object> getUserBySlug(@PathVariable String slug) {
-        try {
-            User user = userService.findBySlug(slug);
+        User user = userService.findBySlug(slug);
 
-            return ResponseEntity.ok(new UserDTO(user.getId(), user.getName(), user.getEmail(),
-                    user.getAvatar(), user.getSlug(), user.getRole()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(e.getMessage()));
-        }
+        return ResponseEntity.ok(new UserDTO(user.getId(), user.getName(), user.getEmail(),
+                user.getAvatar(), user.getSlug(), user.getRole()));
     }
 
     @PostMapping // POST /users
     public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDTO user) {
-        try {
-            User savedUser = userService.createUser(user);
+        User savedUser = userService.createUser(user);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(new UserDTO(
-                    savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
-                    savedUser.getAvatar(), savedUser.getSlug(), savedUser.getRole()));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(new UserDTO(
+                savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
+                savedUser.getAvatar(), savedUser.getSlug(), savedUser.getRole()));
     }
 
     @PatchMapping("/{id}") // PATCH /users/id
     public ResponseEntity<Object> updateUser(@PathVariable UUID id, HttpServletRequest request,
                                              @Valid @RequestBody UserUpdateDTO updateData) {
-        try {
-            String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
+        String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
-            User updatedUser = userService.updateUser(id, UUID.fromString(userId), updateData);
+        User updatedUser = userService.updateUser(id, UUID.fromString(userId), updateData);
 
-            return ResponseEntity.ok((Object) new UserDTO(
-                    updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(),
-                    updatedUser.getAvatar(), updatedUser.getSlug(), updatedUser.getRole()));
-        } catch (RuntimeException e) {
-            HttpStatus status = e.getMessage().contains("not found") ? HttpStatus.NOT_FOUND :
-                    HttpStatus.BAD_REQUEST;
-
-            return ResponseEntity.status(status).body(new MessageResponse(e.getMessage()));
-        }
+        return ResponseEntity.ok((Object) new UserDTO(
+                updatedUser.getId(), updatedUser.getName(), updatedUser.getEmail(),
+                updatedUser.getAvatar(), updatedUser.getSlug(), updatedUser.getRole()));
     }
 
     @DeleteMapping("/{id}") // DELETE /users/id
     public ResponseEntity<Object> deleteUser(@PathVariable UUID id, HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
-        try {
-            userService.deleteUser(id, UUID.fromString(userId));
-
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(e.getMessage()));
-        }
+        userService.deleteUser(id, UUID.fromString(userId));
+        return ResponseEntity.noContent().build();
     }
 }

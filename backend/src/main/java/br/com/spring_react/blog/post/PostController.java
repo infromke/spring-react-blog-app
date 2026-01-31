@@ -39,24 +39,14 @@ public class PostController {
 
     @GetMapping("/{id}") // GET /posts/{id}
     public ResponseEntity<Object> getPostById(@PathVariable UUID id) {
-        try {
-            Post post = postService.findById(id);
-
-            return ResponseEntity.ok(PostMapper.toDetailsDTO(post));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(e.getMessage()));
-        }
+        Post post = postService.findById(id);
+        return ResponseEntity.ok(PostMapper.toDetailsDTO(post));
     }
 
     @GetMapping("/slug/{postSlug}") // GET posts/slug/postSlug
     public ResponseEntity<Object> getPostBySlug(@PathVariable String postSlug) {
-        try {
-            Post post = postService.findBySlug(postSlug);
-
-            return ResponseEntity.ok(PostMapper.toDetailsDTO(post));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(e.getMessage()));
-        }
+        Post post = postService.findBySlug(postSlug);
+        return ResponseEntity.ok(PostMapper.toDetailsDTO(post));
     }
 
     @GetMapping("/author/{authorSlug}") // GET /posts/author/authorSlug
@@ -93,51 +83,39 @@ public class PostController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> createPost(@Valid @RequestBody PostCreateDTO data,
                                              HttpServletRequest request) {
-        try {
-            String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
+        String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(
-                        "User " +
-                                "not authenticated."));
-            }
-
-            Post savedPost = postService.createPost(data, UUID.fromString(userId));
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(PostMapper.toDetailsDTO(savedPost));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse(e.getMessage()));
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(
+                    "User " +
+                            "not authenticated."));
         }
+
+        Post savedPost = postService.createPost(data, UUID.fromString(userId));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(PostMapper.toDetailsDTO(savedPost));
     }
 
     @PatchMapping("/{id}") // PATCH /posts/{id}
     public ResponseEntity<Object> updatePost(@PathVariable UUID id, HttpServletRequest request,
                                              @RequestBody PostUpdateDTO updateData) {
-        try {
-            String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
+        String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
-            if (userId == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(
-                        "User not authenticated."));
-            }
-
-            Post updatedPost = postService.updatePost(id, UUID.fromString(userId), updateData);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(PostMapper.toDetailsDTO(updatedPost));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(e.getMessage()));
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(
+                    "User not authenticated."));
         }
+
+        Post updatedPost = postService.updatePost(id, UUID.fromString(userId), updateData);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(PostMapper.toDetailsDTO(updatedPost));
     }
 
     @DeleteMapping("/{id}") // DELETE /posts/{id}
     public ResponseEntity<Object> deletePost(@PathVariable UUID id, HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
-        try {
-            postService.deletePost(id, UUID.fromString(userId));
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse(e.getMessage()));
-        }
+        postService.deletePost(id, UUID.fromString(userId));
+        return ResponseEntity.noContent().build();
     }
 }
