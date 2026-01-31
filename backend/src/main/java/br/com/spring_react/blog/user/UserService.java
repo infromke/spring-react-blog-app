@@ -64,7 +64,11 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(UUID id, UserUpdateDTO data) {
+    public User updateUser(UUID id, UUID authenticatedUserId, UserUpdateDTO data) {
+        if (!id.equals(authenticatedUserId)) {
+            throw new RuntimeException("You are not authorized to modify this account.");
+        }
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found."));
 
@@ -100,7 +104,11 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(UUID id) {
+    public void deleteUser(UUID id, UUID authenticatedUserId) {
+        if (!id.equals(authenticatedUserId)) {
+            throw new RuntimeException("You are not authorized to modify this account.");
+        }
+
         if (!userRepository.existsById(id)) {
             throw new RuntimeException("User not found.");
         }

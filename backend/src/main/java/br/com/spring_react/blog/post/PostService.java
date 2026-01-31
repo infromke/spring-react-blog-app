@@ -67,9 +67,13 @@ public class PostService {
     }
 
     @Transactional
-    public Post updatePost(UUID postId, PostUpdateDTO data) {
+    public Post updatePost(UUID postId, UUID authenticatedUserId, PostUpdateDTO data) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found."));
+
+        if (!post.getAuthor().getId().equals(authenticatedUserId)) {
+            throw new RuntimeException("You are not authorized to modify this post.");
+        }
 
         if (data.title() != null) {
             post.setTitle(data.title());
@@ -87,10 +91,14 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(UUID id) {
-        if (!postRepository.existsById(id)) {
-            throw new RuntimeException("Post not found.");
+    public void deletePost(UUID id, UUID authenticatedUserId) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found."));
+
+        if (!post.getAuthor().getId().equals(authenticatedUserId)) {
+            throw new RuntimeException("You are not authorized to modify this post.");
         }
+
         postRepository.deleteById(id);
     }
 }
