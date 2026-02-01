@@ -97,12 +97,6 @@ public class PostController {
                                              HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(
-                    "User " +
-                            "not authenticated."));
-        }
-
         Post savedPost = postService.createPost(data, UUID.fromString(userId));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(PostMapper.toDetailsDTO(savedPost));
@@ -112,11 +106,6 @@ public class PostController {
     public ResponseEntity<Object> updatePost(@PathVariable UUID id, HttpServletRequest request,
                                              @RequestBody PostUpdateDTO updateData) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
-
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new MessageResponse(
-                    "User not authenticated."));
-        }
 
         Post updatedPost = postService.updatePost(id, UUID.fromString(userId), updateData);
 
