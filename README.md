@@ -1,5 +1,7 @@
 # Full-Stack Blog System
 
+> ⚠️ Este projeto está em transição ativa de Node.js para Java Spring Boot.
+
 Uma aplicação de plataforma para blog desenvolvida com a **PERN** Stack (PostgreSQL, Express, React, Node.js).
 
 ## Visão Geral Técnica (até agora...)
@@ -47,9 +49,6 @@ O projeto é **híbrido**, tendo classes (Singleton) para camadas que mantêm re
 
 ## Planos Futuros
 
-- [x] **Camadas de Abstração**: Implementar Services (lógica de negócio) e Repositories (acesso a dados) para desacoplar o Sequelize dos Controllers;
-- [x] **Processamento de Imagem**: Integrar o `Sharp` para compressão automática e conversão para formato `.webp`;
-- [x] **Padronização de Erros**: Centralizar o tratamento de exceções com o utilitário `throwHttpError`;
-- [ ] **Migração de Ecossistema**: Reimplementar o back-end em `Java Spring Boot`;
+- [ • ] **Migração de Ecossistema**: Reimplementar o back-end em `Java Spring Boot`;
 - [ ] **Documentação**: Organizar e disponibilizar a documentação dos endpoints da API;
 - [ ] **Construção da Fachada**: Desenvolver o front-end com `React`.
