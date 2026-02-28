@@ -45,6 +45,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/comments/post/**").permitAll() // tudo que é GET em /comments é público
                         .requestMatchers("/comments/**").authenticated() // POST, PATCH e DELETE em /comments exige login
 
+                        // endpoints para LIKES
+                        .requestMatchers(HttpMethod.POST, "/likes/post/").authenticated() // é necessário estar logado para curtir posts
+
                         // outras rotas (fallback)
                         .anyRequest().authenticated()
                 )
