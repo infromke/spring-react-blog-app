@@ -1,4 +1,4 @@
-package br.com.spring_react.blog.session;
+package br.com.spring_react.blog.infra.services;
 
 import br.com.spring_react.blog.user.internal.User;
 import com.auth0.jwt.JWT;
