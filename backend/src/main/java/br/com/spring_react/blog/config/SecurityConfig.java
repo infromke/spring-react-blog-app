@@ -48,6 +48,13 @@ public class SecurityConfig {
                         // endpoints para LIKES
                         .requestMatchers(HttpMethod.POST, "/likes/post/").authenticated() // é necessário estar logado para curtir posts
 
+                        // endpoints para ACESSAR A DOCUMENTAÇÃO da API
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html")
+                        .permitAll()
+
                         // outras rotas (fallback)
                         .anyRequest().authenticated()
                 )
