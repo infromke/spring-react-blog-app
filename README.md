@@ -65,11 +65,15 @@ padrões de design nativos do Spring Framework:
   atualizar avatares ou banners, evitando o acúmulo desnecessário;
 - **Slugification**: Geração automática de URLs para posts e perfis com o hook `@PrePersist`.
 
+## Documentação da API
+
+É possível acessar a documentação interativa da API com o Swagger UI por meio da URL
+`http://localhost:8080/swagger-ui/index.html/`, basta rodar o servidor.
+
 ## Planos Futuros
 
-- [x] **Interatividade**: Implementar os módulos de `Comment` (Comentários) e `PostLike` (
-  Curtidas);
-- [ ] **HATEOAS**: Adicionar hipermídia aos recursos da API para alcançar maior maturidade REST;
-- [ ] **Documentação**: Organizar e disponibilizar a documentação dos endpoints da API;
+- [x] **Interatividade**: Implementar os módulos de `Comment` (Comentários) e `PostLike` (Curtidas);
+- [x] **Documentação**: Organizar e disponibilizar a documentação dos endpoints da API;
 - [ ] **Construção da Fachada**: Desenvolver o front-end com `React`;
+- [ ] **HATEOAS**: Adicionar hipermídia aos recursos da API para alcançar maior maturidade REST;
 - [ ] **Otimização de Imagens**: Implementar compressão avançada e filtros de pós-processamento.
