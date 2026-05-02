@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.util.List;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -28,11 +30,18 @@ public class GlobalExceptionHandler {
                 "RESOURCE_ALREADY_EXISTS", ex);
     }
 
-    // lida com ERROS DE VALIDAÇÃO (exibe apenas o primeiro)
+    // lida com ERROS DE VALIDAÇÃO no estilo Zod
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        String msg = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        return ErrorResponse.build(HttpStatus.BAD_REQUEST, msg, "VALIDATION_ERROR", null);
+    public ResponseEntity<List<ValidationErrorResponse>> handleValidation(MethodArgumentNotValidException ex) {
+        List<ValidationErrorResponse> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> new ValidationErrorResponse(
+                        error.getField(),
+                        error.getDefaultMessage()
+                ))
+                .toList();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     // lida com RESTRIÇÃO DE ACESSO
