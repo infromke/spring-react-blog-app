@@ -1,5 +1,6 @@
 package br.com.spring_react.blog.infra.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,6 +19,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotFound(NoHandlerFoundException ex) {
         return ErrorResponse.build(HttpStatus.NOT_FOUND, "Route not found.", "ROUTE_NOT_FOUND",
                 null);
+    }
+
+    // lida com ERRO DE DUPLICIDADE no banco de dados
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(DataIntegrityViolationException ex) {
+        return ErrorResponse.build(HttpStatus.CONFLICT, "One or more records already exist.",
+                "RESOURCE_ALREADY_EXISTS", ex);
     }
 
     // lida com ERROS DE VALIDAÇÃO (exibe apenas o primeiro)
