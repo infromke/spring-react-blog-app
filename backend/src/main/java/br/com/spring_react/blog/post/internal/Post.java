@@ -1,5 +1,6 @@
 package br.com.spring_react.blog.post.internal;
 
+import br.com.spring_react.blog.infra.utils.SlugGenerator;
 import br.com.spring_react.blog.user.internal.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
@@ -55,9 +56,7 @@ public class Post {
 
         // cria um slug único para o post (titulo-completo-e-uuid)
         if (this.slug == null || this.slug.isEmpty()) {
-            String baseSlug = title.toLowerCase().replaceAll("[^a-z0-9]", "-");
-            String shortId = UUID.randomUUID().toString().split("-")[0];
-            this.slug = baseSlug + "-" + shortId;
+            this.slug = SlugGenerator.generate(this.title);
         }
     }
 

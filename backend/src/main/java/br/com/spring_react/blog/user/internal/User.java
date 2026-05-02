@@ -1,5 +1,6 @@
 package br.com.spring_react.blog.user.internal;
 
+import br.com.spring_react.blog.infra.utils.SlugGenerator;
 import br.com.spring_react.blog.post.internal.Post;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -110,11 +111,14 @@ public class User implements UserDetails {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
 
-        // cria um slug único para o usuário (nome-completo-e-uuid)
+        // cria um slug único para o usuário (nome-e-uuid OU nome-sobrenome-e-uuid)
         if (this.slug == null || this.slug.isEmpty()) {
-            String baseSlug = name.toLowerCase().replaceAll("[^a-z0-9]", "-");
-            String shortId = UUID.randomUUID().toString().split("-")[0];
-            this.slug = baseSlug + "-" + shortId;
+            String[] names = this.name.trim().split("\\s+"); // desconsidera espaços extras
+            String slugInput = (names.length > 1)
+                    ? names[0] + " " + names[names.length - 1]
+                    : names[0];
+
+            this.slug = SlugGenerator.generate(slugInput);
         }
 
         // atribui um avatar ao usuário a partir do seu primeiro nome
