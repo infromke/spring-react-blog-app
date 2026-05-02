@@ -29,7 +29,7 @@ public class User implements UserDetails {
     @Setter(AccessLevel.PROTECTED)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 54)
     @Size(min = 2, max = 54)
     private String name;
 
@@ -48,8 +48,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING) // pode ser "USER" ou "ADMIN"
     @Column(nullable = false)
     private UserRole role = UserRole.USER; // o padrão é "USER"
-    
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY, cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private List<Post> posts;
 
     @Column(name = "created_at", updatable = false)

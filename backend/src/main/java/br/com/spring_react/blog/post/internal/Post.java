@@ -19,15 +19,15 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 150)
     @Size(min = 5, max = 150)
     private String title;
 
+    @Column(length = 200)
     @Size(max = 200)
-    @Column
     private String summary;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false, length = 20000)
     @Size(min = 100, max = 20000)
     private String content;
 
@@ -37,7 +37,7 @@ public class Post {
     @Column(unique = true, nullable = false)
     private String slug;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
