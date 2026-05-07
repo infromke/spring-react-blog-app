@@ -43,6 +43,29 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // lida com ERRO DE CONVERSÃO de parâmetros (ex: UUID)
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request) {
+
+        // pega o tipo esperado ou usa um valor genérico
+        String requiredType = (ex.getRequiredType() != null)
+                ? ex.getRequiredType().getSimpleName()
+                : "defined type";
+
+        String detail = String.format("The parameter '%s' has an invalid value. Expected type: %s",
+                ex.getName(), requiredType);
+
+        return ErrorResponse.build(
+                "about:blank",
+                HttpStatus.BAD_REQUEST,
+                detail,
+                request.getRequestURI(),
+                null
+        );
+    }
+
     // lida com ERROS DE VALIDAÇÃO no estilo Zod
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
