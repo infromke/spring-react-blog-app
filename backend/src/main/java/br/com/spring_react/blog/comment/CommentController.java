@@ -5,6 +5,8 @@ import br.com.spring_react.blog.comment.dto.CommentDetailsDTO;
 import br.com.spring_react.blog.comment.dto.CommentUpdateDTO;
 import br.com.spring_react.blog.comment.internal.Comment;
 import br.com.spring_react.blog.comment.internal.CommentMapper;
+import br.com.spring_react.blog.infra.ratelimit.RateLimit;
+import br.com.spring_react.blog.infra.ratelimit.RateLimitType;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -43,6 +45,7 @@ public class CommentController {
     }
 
     @PostMapping("/post/{postId}") // POST /comments/post/{postId}
+    @RateLimit(type = RateLimitType.COMMENT_CREATION)
     @Operation(summary = "Cria um novo comentário", description = "Vincula um comentário a um " +
             "post existente usando o ID do usuário autenticado e o ID da publicação")
     public ResponseEntity<Object> createComment(@PathVariable UUID postId,

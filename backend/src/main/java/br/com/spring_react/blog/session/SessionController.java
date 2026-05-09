@@ -1,5 +1,7 @@
 package br.com.spring_react.blog.session;
 
+import br.com.spring_react.blog.infra.ratelimit.RateLimit;
+import br.com.spring_react.blog.infra.ratelimit.RateLimitType;
 import br.com.spring_react.blog.session.dto.LoginRequestDTO;
 import br.com.spring_react.blog.session.dto.LoginResponse;
 import br.com.spring_react.blog.user.dto.UserDTO;
@@ -50,6 +52,7 @@ public class SessionController {
     }
 
     @PostMapping("/login") // POST /sessions/login
+    @RateLimit(type = RateLimitType.LOGIN)
     @SecurityRequirements(value = {})
     @Operation(summary = "Realiza o login de um usuário", description = "Cria uma nova sessão e " +
             "atribui um token de acesso (JWT) a um cookie httpOnly")

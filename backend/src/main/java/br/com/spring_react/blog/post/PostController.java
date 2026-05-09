@@ -1,5 +1,7 @@
 package br.com.spring_react.blog.post;
 
+import br.com.spring_react.blog.infra.ratelimit.RateLimit;
+import br.com.spring_react.blog.infra.ratelimit.RateLimitType;
 import br.com.spring_react.blog.post.dto.PostCreateDTO;
 import br.com.spring_react.blog.post.dto.PostDetailsDTO;
 import br.com.spring_react.blog.post.dto.PostUpdateDTO;
@@ -95,6 +97,7 @@ public class PostController {
     }
 
     @PostMapping // POST /posts
+    @RateLimit(type = RateLimitType.POST_CREATION)
     @Operation(summary = "Cria uma nova publicação", description = "Vincula uma publicação a um " +
             "autor existente usando o ID do usuário autenticado")
     @PreAuthorize("hasRole('ADMIN')")

@@ -1,5 +1,7 @@
 package br.com.spring_react.blog.user;
 
+import br.com.spring_react.blog.infra.ratelimit.RateLimit;
+import br.com.spring_react.blog.infra.ratelimit.RateLimitType;
 import br.com.spring_react.blog.user.dto.UserCreateDTO;
 import br.com.spring_react.blog.user.dto.UserDTO;
 import br.com.spring_react.blog.user.dto.UserUpdateDTO;
@@ -88,6 +90,7 @@ public class UserController {
     }
 
     @PostMapping // POST /users
+    @RateLimit(type = RateLimitType.SIGNUP)
     @Operation(summary = "Cria um novo usuário", description = "Cria um novo usuário no banco de " +
             "dados com role padrão \"USER\" e avatar gerado a partir de suas iniciais")
     public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDTO user) {
