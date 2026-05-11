@@ -53,8 +53,7 @@ public class UserController {
 
     @GetMapping("/{id}") // GET /users/id
     @Operation(summary = "Lista o usuário solicitado por ID", description = "Retorna os dados " +
-            "básicos do" +
-            " usuário associado ao ID providenciado")
+            "básicos do usuário associado ao ID providenciado")
     public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
         User user = userService.findById(id);
 
@@ -72,8 +71,7 @@ public class UserController {
 
     @GetMapping("/profile/{slug}") // GET /users/profile/slug
     @Operation(summary = "Lista o usuário solicitado por slug", description = "Retorna os dados " +
-            "básicos do" +
-            " usuário associado ao slug providenciado")
+            "básicos do usuário associado ao slug providenciado")
     public ResponseEntity<Object> getUserBySlug(@PathVariable String slug) {
         User user = userService.findBySlug(slug);
 
