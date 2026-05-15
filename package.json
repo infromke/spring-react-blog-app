@@ -1,0 +1,16 @@
+{
+  "name": "pern-blog-system",
+  "version": "1.0.0",
+  "description": "Plataforma de blog",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/infrmke/spring-react-blog-system.git"
+  },
+  "author": "Inaros Lemuel <infromke@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/infrmke/spring-react-blog-system/issues"
+  },
+  "homepage": "https://github.com/infrmke/spring-react-blog-system/tree/legacy/node-pern#readme"
+}
