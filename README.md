@@ -71,22 +71,31 @@ os padrões de design nativos do ecossistema Spring, com foco em performance:
 Antes de rodar a API, você precisará acatar aos seguintes **pré-requisitos**: Java 21 JDK (Amazon
 Corretto ou Zulu), PostgreSQL e Maven (opcional, pois o projeto inclui o Maven Wrapper).
 
-1. Configuração do Banco de Dados
+1. Clone o Repositório
+
+Abra o terminal e execute:
+
+```shell
+  git clone https://github.com/infrmke/spring-react-blog-system.git
+  cd spring-react-blog-system
+```
+
+2. Configure o Banco de Dados
 
 Crie um banco de dados no PostgreSQL chamado "blog_db" (ou o que preferir). Em seguida, ajuste as
 credenciais no arquivo `src/main/resources/application.properties`:
 
-```
-  spring.datasource.url=jdbc:postgresql://localhost:5432/nome_do_seu_banco
-  spring.datasource.username=seu_usuario
-  spring.datasource.password=sua_senha
+```properties
+    spring.datasource.url=jdbc:postgresql://localhost:5432/nome_do_seu_banco
+    spring.datasource.username=seu_usuario
+    spring.datasource.password=sua_senha
 ```
 
-2. Instalação de Dependências
+3. Instale as Dependências
 
 Baixe todas as dependências do `pom.xml`:
 
-```
+```shell
   # Windows (PowerShell/CMD)
   .\mvnw.cmd clean install
 
@@ -94,11 +103,11 @@ Baixe todas as dependências do `pom.xml`:
   ./mvnw clean install
 ```
 
-3. Execução da API
+4. Execute a API
 
 Para subir o servidor, execute:
 
-```
+```shell
   # Windows (PowerShell/CMD)
   .\mvnw.cmd spring-boot:run
 
@@ -110,33 +119,43 @@ A API estará disponível em http://localhost:8080.
 
 ## Documentação da API
 
-É possível acessar a documentação interativa da API com o Swagger UI por meio da URL
-http://localhost:8080/swagger-ui/index.html, basta rodar o servidor.
+<p align="center">
+  <a href="https://www.postman.com/infrkme/workspace/public/collection/37979308-a7e3a9c0-200b-4da4-88df-5ab8783faa6a?action=share&creator=37979308">
+    <img src="https://run.pstmn.io/button.svg" alt="Run in Postman" height="35">
+  </a>
+</p>
+
+Os endpoints da API podem ser acessados e testados através da coleção pública no Postman expressa
+acima. Certifique-se de configurar o ambiente (environment) com a variável `baseUrl` apontando para
+o servidor que você definiu.
+
+Ainda, é possível acessar a documentação interativa da API com o Swagger UI por meio da URL
+http://localhost:8080/swagger-ui/index.html, basta rodar o servidor. A documentação suporta testes
+autenticados. Após realizar o login em `/sessions/login`, utilize o botão "Authorize" no topo da
+página e insira seu Token JWT para desbloquear os endpoints protegidos.
 
 As respostas de erro seguem o padrão `application/problem+json`. Um exemplo de erro de validação
 segue abaixo:
 
+```json
+{
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Your request has invalid fields",
+  "instance": "/users",
+  "errors": [
+    {
+      "path": "name",
+      "message": "Name must be between 2 or 54 characters"
+    },
+    {
+      "path": "confirmPassword",
+      "message": "Confirm password is required"
+    }
+  ]
+}
 ```
-  {
-    "type": "about:blank",
-    "title": "Bad Request",
-    "status": 400,
-    "detail": "Your request has invalid fields",
-    "instance": "/users"
-    "errors": [
-		{
-			"path": "name",
-			"message": "Name must be between 2 or 54 characters"
-		},
-			"path": "confirmPassword",
-			"message": "Confirm password is required"
-		}
-	]
-  }
-```
-
-A documentação suporta testes autenticados. Após realizar o login em `/sessions/login`, utilize o
-botão "Authorize" no topo da página e insira seu Token JWT para desbloquear os endpoints protegidos.
 
 ## Planos Futuros
 
@@ -150,7 +169,8 @@ botão "Authorize" no topo da página e insira seu Token JWT para desbloquear os
 A inspiração inicial para o começo do projeto foi o
 Youtuber [Sahand](https://www.youtube.com/@reactproject), por meio do seu próprio projeto de
 plataforma de blog com a stack MERN. Primeiramente, recriei o back-end do projeto com o PostgreSQL
-em vez do MongoDB e, mais tarde, me desafiei a reestruturar o projeto para o ecossistema Java Spring Boot.
+em vez do MongoDB e, mais tarde, me desafiei a reestruturar o projeto para o ecossistema Java Spring
+Boot.
 
 Neste projeto, aprendi a...
 
