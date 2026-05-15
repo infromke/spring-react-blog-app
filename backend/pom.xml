@@ -12,7 +12,7 @@
 	<artifactId>blog</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>blog</name>
-	<description>Uma API modular para blog desenvolvida com PostgreSQL e Java Spring Boot</description>
+	<description>Uma API modular para blog desenvolvida com Java 21, Spring Boot 4 e PostgreSQL</description>
 	<url/>
 	<licenses>
 		<license/>
