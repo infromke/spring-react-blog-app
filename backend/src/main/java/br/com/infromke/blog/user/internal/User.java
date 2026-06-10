@@ -75,10 +75,16 @@ public class User implements UserDetails {
     @Override
     @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // o role ADMIN tem permissão de ADMIN e de USER
         if (this.role == UserRole.ADMIN) {
             return List.of(
                     new SimpleGrantedAuthority("ROLE_ADMIN"),
+                    new SimpleGrantedAuthority("ROLE_AUTHOR"),
+                    new SimpleGrantedAuthority("ROLE_USER")
+            );
+        }
+        if (this.role == UserRole.AUTHOR) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_AUTHOR"),
                     new SimpleGrantedAuthority("ROLE_USER")
             );
         }
