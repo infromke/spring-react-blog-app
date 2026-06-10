@@ -6,9 +6,11 @@ import br.com.infromke.blog.infra.exceptions.ResourceAlreadyExistsException;
 import br.com.infromke.blog.infra.exceptions.ResourceNotFoundException;
 import br.com.infromke.blog.infra.services.MultiPartService;
 import br.com.infromke.blog.user.dto.UserCreateDTO;
+import br.com.infromke.blog.user.dto.UserRoleUpdateDTO;
 import br.com.infromke.blog.user.dto.UserUpdateDTO;
 import br.com.infromke.blog.user.internal.User;
 import br.com.infromke.blog.user.internal.UserRepository;
+import br.com.infromke.blog.user.internal.UserRole;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -145,6 +147,14 @@ public class UserService {
         );
 
         user.setAvatar(newFileName);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void updateUserRole(UUID id, UserRole newRole) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setRole(newRole);
         userRepository.save(user);
     }
 

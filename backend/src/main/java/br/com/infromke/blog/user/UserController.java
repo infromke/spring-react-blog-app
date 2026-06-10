@@ -4,6 +4,7 @@ import br.com.infromke.blog.infra.ratelimit.RateLimit;
 import br.com.infromke.blog.infra.ratelimit.RateLimitType;
 import br.com.infromke.blog.user.dto.UserCreateDTO;
 import br.com.infromke.blog.user.dto.UserDTO;
+import br.com.infromke.blog.user.dto.UserRoleUpdateDTO;
 import br.com.infromke.blog.user.dto.UserUpdateDTO;
 import br.com.infromke.blog.user.internal.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,12 +80,12 @@ public class UserController {
 
         return ResponseEntity.ok(
                 new UserDTO(
-                    user.getId(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getAvatar(),
-                    user.getSlug(),
-                    user.getRole()
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getAvatar(),
+                        user.getSlug(),
+                        user.getRole()
                 )
         );
     }
@@ -99,12 +101,12 @@ public class UserController {
                 .status(HttpStatus.CREATED)
                 .body(
                         new UserDTO(
-                            savedUser.getId(),
-                            savedUser.getName(),
-                            savedUser.getEmail(),
-                            savedUser.getAvatar(),
-                            savedUser.getSlug(),
-                            savedUser.getRole()
+                                savedUser.getId(),
+                                savedUser.getName(),
+                                savedUser.getEmail(),
+                                savedUser.getAvatar(),
+                                savedUser.getSlug(),
+                                savedUser.getRole()
                         )
                 );
     }
@@ -119,17 +121,18 @@ public class UserController {
 
         return ResponseEntity.ok((Object)
                 new UserDTO(
-                    updatedUser.getId(),
-                    updatedUser.getName(),
-                    updatedUser.getEmail(),
-                    updatedUser.getAvatar(),
-                    updatedUser.getSlug(),
-                    updatedUser.getRole()
+                        updatedUser.getId(),
+                        updatedUser.getName(),
+                        updatedUser.getEmail(),
+                        updatedUser.getAvatar(),
+                        updatedUser.getSlug(),
+                        updatedUser.getRole()
                 )
         );
     }
 
     @PatchMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // PATCH /users/id/avatar
     @Operation(summary = "Atualiza o avatar do usuário informado por ID", description = "Atualiza" +
             " o avatar do usuário associado ao ID providenciado, excluindo o arquivo binário " +
             "antigo caso o mesmo exista")
@@ -144,6 +147,17 @@ public class UserController {
 
         userService.updateAvatar(id, UUID.fromString(userId), bytes, contentType);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/role") // PATCH /users/id/role
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Atualiza o campo \"role\" do usuário informado por ID", description =
+            "Promove um usuário de qualquer tipo para USER, AUTHOR ou ADMIN. Apenas " +
+                    "administradores podem realizar essa operação")
+    public ResponseEntity<Object> updateRole(@PathVariable UUID id,
+                                             @Valid @RequestBody UserRoleUpdateDTO dto) {
+        userService.updateUserRole(id, dto.role());
         return ResponseEntity.noContent().build();
     }
 
