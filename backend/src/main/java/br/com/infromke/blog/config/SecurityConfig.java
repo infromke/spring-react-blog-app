@@ -44,6 +44,7 @@ public class SecurityConfig {
                                     403,
                                     "Cannot proceed without necessary permissions",
                                     request.getRequestURI(),
+                                    null,
                                     null
                             );
 
@@ -62,6 +63,7 @@ public class SecurityConfig {
                                     401,
                                     "You must be authenticated to access this resource",
                                     request.getRequestURI(),
+                                    null,
                                     null
                             );
 

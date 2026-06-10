@@ -1,6 +1,8 @@
 package br.com.infromke.blog.infra.exceptions;
 
+import br.com.infromke.blog.infra.utils.ExceptionStackGenerator;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,9 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Value("${SPRING_ENV:production}")
+    private String springEnv;
+
     /* EXCEÇÕES GENÉRICAS */
 
     // lida com ROTAS QUE NÃO EXISTEM
@@ -26,7 +31,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 "Route not found",
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -39,7 +45,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT,
                 "One or more records already exist",
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -62,7 +69,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 detail,
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -84,7 +92,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 "Your request has invalid fields",
                 request.getRequestURI(),
-                validationErrors
+                validationErrors,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -97,7 +106,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.FORBIDDEN,
                 "You are not authorized to proceed with this action",
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -109,7 +119,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 ex.getMessage(),
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -124,7 +135,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 ex.getMessage(),
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -137,7 +149,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.FORBIDDEN,
                 ex.getMessage(),
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -152,7 +165,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 ex.getMessage(),
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -165,7 +179,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT,
                 ex.getMessage(),
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 
@@ -178,7 +193,8 @@ public class GlobalExceptionHandler {
                 HttpStatus.TOO_MANY_REQUESTS,
                 ex.getMessage(),
                 request.getRequestURI(),
-                null
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
         );
     }
 }
