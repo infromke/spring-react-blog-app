@@ -1,9 +1,7 @@
 package br.com.infromke.blog.config;
 
-import br.com.infromke.blog.infra.exceptions.ErrorResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import br.com.infromke.blog.infra.security.CustomAccessDeniedHandler;
+import br.com.infromke.blog.infra.security.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,55 +19,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final SecurityFilter securityFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public SecurityConfig(SecurityFilter securityFilter) {
+    public SecurityConfig(
+            SecurityFilter securityFilter,
+            CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+            CustomAccessDeniedHandler customAccessDeniedHandler
+    ) {
         this.securityFilter = securityFilter;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
-                        // exceção para quando o usuário está logado mas não tem a ROLE necessária
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            // Content-Type da RFC 7807
-                            response.setContentType("application/problem+json;charset=UTF-8");
-                            response.setStatus(403);
-
-                            ErrorResponse error = new ErrorResponse(
-                                    "about:blank",
-                                    "Forbidden",
-                                    403,
-                                    "Cannot proceed without necessary permissions",
-                                    request.getRequestURI(),
-                                    null,
-                                    null
-                            );
-
-                            // converte o objeto em String e insere na response
-                            String json = objectMapper.writeValueAsString(error);
-                            response.getWriter().write(json);
-                        })
-                        // exceção para quando o usuário NÃO está logado ou o token é inválido
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setContentType("application/problem+json;charset=UTF-8");
-                            response.setStatus(401);
-
-                            ErrorResponse error = new ErrorResponse(
-                                    "about:blank",
-                                    "Unauthorized",
-                                    401,
-                                    "You must be authenticated to access this resource",
-                                    request.getRequestURI(),
-                                    null,
-                                    null
-                            );
-
-                            String json = objectMapper.writeValueAsString(error);
-                            response.getWriter().write(json);
-                        })
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         // rotas de autenticação
@@ -110,12 +80,5 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS); // formata a data em padrão ISO-8601
     }
 }

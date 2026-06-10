@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
     // lida com ROTAS QUE NÃO EXISTEM
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handleRouteNotFound(NoHandlerFoundException ex,
-                                                        HttpServletRequest request) {
+                                                             HttpServletRequest request) {
         return ErrorResponse.build(
                 "about:blank",
                 HttpStatus.NOT_FOUND,
@@ -97,6 +98,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // lida com FALTA DE AUTENTICAÇÃO ou TOKEN INVÁLIDO
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationNeeded(AuthenticationException ex,
+                                                                    HttpServletRequest request) {
+        return ErrorResponse.build(
+                "about:blank",
+                HttpStatus.UNAUTHORIZED,
+                "You must be authenticated to access this resource",
+                request.getRequestURI(),
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
+        );
+    }
+
     // lida com RESTRIÇÃO DE ACESSO
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex,
@@ -129,7 +144,7 @@ public class GlobalExceptionHandler {
     // lida com REQUISIÇÕES MAL-FORMATADAS
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex,
-                                                               HttpServletRequest request) {
+                                                          HttpServletRequest request) {
         return ErrorResponse.build(
                 "about:blank",
                 HttpStatus.BAD_REQUEST,
