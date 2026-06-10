@@ -171,7 +171,7 @@ public class GlobalExceptionHandler {
 
     // lida com EXCEDÊNCIA DE REQUISIÇÕES
     @ExceptionHandler(RateLimitExceededException.class)
-    public ResponseEntity<ErrorResponse> handleForbiddenAction(RateLimitExceededException ex,
+    public ResponseEntity<ErrorResponse> handleRequestOverload(RateLimitExceededException ex,
                                                                HttpServletRequest request) {
         return ErrorResponse.build(
                 "about:blank",
