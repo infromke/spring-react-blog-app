@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
 
     // lida com ROTAS QUE NÃO EXISTEM
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(NoHandlerFoundException ex,
+    public ResponseEntity<ErrorResponse> handleRouteNotFound(NoHandlerFoundException ex,
                                                         HttpServletRequest request) {
         return ErrorResponse.build(
                 "about:blank",
