@@ -75,6 +75,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // lida com OPERAÇÕES INTERNAS ILEGAIS
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<ErrorResponse> handleUnsupportedOperation(
+            UnsupportedOperationException ex, HttpServletRequest request) {
+        return ErrorResponse.build(
+                "about:blank",
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.getMessage(),
+                request.getRequestURI(),
+                null,
+                ExceptionStackGenerator.getStackTrace(ex, springEnv)
+        );
+    }
+
     // lida com ERROS DE VALIDAÇÃO no estilo Zod
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(
