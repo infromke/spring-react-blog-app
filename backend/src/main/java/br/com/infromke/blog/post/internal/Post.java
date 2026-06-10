@@ -31,7 +31,7 @@ public class Post {
     @Size(max = 200)
     private String summary;
 
-    @Column(columnDefinition = "TEXT", nullable = false, length = 20000)
+    @Column(columnDefinition = "TEXT", nullable = false)
     @Size(min = 100, max = 20000)
     private String content;
 
