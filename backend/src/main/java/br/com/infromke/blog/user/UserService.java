@@ -28,7 +28,8 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final MultiPartService multiPartService;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, MultiPartService multiPartService) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
+                       MultiPartService multiPartService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.multiPartService = multiPartService;
@@ -121,7 +122,8 @@ public class UserService {
 
     @Transactional
     @CacheEvict(value = "profiles", allEntries = true)
-    public void updateAvatar(UUID id, UUID authenticatedUserId, MultipartFile file) {
+    public void updateAvatar(UUID id, UUID authenticatedUserId, byte[] fileBytes,
+                             String contentType) {
         if (!id.equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this account");
         }
@@ -134,8 +136,13 @@ public class UserService {
             multiPartService.deleteImage("avatars", user.getAvatar());
         }
 
-        // redimensiona e converte a imagem para .webp
-        String newFileName = multiPartService.processImage(file, "avatars", 500);
+        // processa, redimensiona e converte a imagem para .webp
+        String newFileName = multiPartService.processImage(
+                fileBytes,
+                contentType,
+                "avatars",
+                500
+        );
 
         user.setAvatar(newFileName);
         userRepository.save(user);

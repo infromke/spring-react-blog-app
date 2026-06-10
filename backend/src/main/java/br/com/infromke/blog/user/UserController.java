@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -134,9 +135,14 @@ public class UserController {
             "antigo caso o mesmo exista")
     public ResponseEntity<Object> updateAvatar(@PathVariable UUID id,
                                                HttpServletRequest request,
-                                               @RequestParam("avatar") MultipartFile file) {
+                                               @RequestParam("avatar") MultipartFile file) throws IOException {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
-        userService.updateAvatar(id, UUID.fromString(userId), file);
+
+        // extrai os bytes e o tipo do arquivo
+        byte[] bytes = file.getBytes();
+        String contentType = file.getContentType();
+
+        userService.updateAvatar(id, UUID.fromString(userId), bytes, contentType);
 
         return ResponseEntity.noContent().build();
     }

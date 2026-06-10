@@ -27,7 +27,8 @@ public class PostService {
     private final UserService userService;
     private final MultiPartService multiPartService;
 
-    public PostService(PostRepository postRepository, UserService userService, MultiPartService multiPartService) {
+    public PostService(PostRepository postRepository, UserService userService,
+                       MultiPartService multiPartService) {
         this.postRepository = postRepository;
         this.userService = userService;
         this.multiPartService = multiPartService;
@@ -117,7 +118,8 @@ public class PostService {
             @CacheEvict(value = "posts", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)
     })
-    public void updateBanner(UUID id, UUID authenticatedUserId, MultipartFile file) {
+    public void updateBanner(UUID id, UUID authenticatedUserId, byte[] fileBytes,
+                             String contentType) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 
@@ -130,8 +132,13 @@ public class PostService {
             multiPartService.deleteImage("banners", post.getBanner());
         }
 
-        // redimensiona e converte a imagem para .webp
-        String newFileName = multiPartService.processImage(file, "banners", 1200);
+        // processa, redimensiona e converte a imagem para .webp
+        String newFileName = multiPartService.processImage(
+                fileBytes,
+                contentType,
+                "banners",
+                1200
+        );
 
         post.setBanner(newFileName);
         postRepository.save(post);

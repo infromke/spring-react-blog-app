@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -131,9 +132,14 @@ public class PostController {
                     "binário antigo caso o mesmo existe")
     public ResponseEntity<Object> updateBanner(@PathVariable("id") UUID postId,
                                                HttpServletRequest request,
-                                               @RequestParam("banner") MultipartFile file) {
-        String userId = (String) request.getAttribute("userId");
-        postService.updateBanner(postId, UUID.fromString(userId), file);
+                                               @RequestParam("banner") MultipartFile file) throws IOException {
+        String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
+
+        // extrai os bytes e o tipo do arquivo
+        byte[] bytes = file.getBytes();
+        String contentType = file.getContentType();
+
+        postService.updateBanner(postId, UUID.fromString(userId), bytes, contentType);
 
         return ResponseEntity.noContent().build();
     }

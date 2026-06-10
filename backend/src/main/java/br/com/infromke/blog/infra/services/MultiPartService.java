@@ -5,7 +5,6 @@ import com.sksamuel.scrimage.webp.WebpWriter;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,10 +21,10 @@ public class MultiPartService {
 
     private final List<String> ALLOWED_MIMES = List.of("image/jpeg", "image/png", "image/webp");
 
-    public String processImage(MultipartFile file, String folder, int targetWidth) {
+    public String processImage(byte[] fileBytes, String contentType, String folder, int targetWidth) {
         try {
-            // validação de mimetype
-            if (!ALLOWED_MIMES.contains(file.getContentType())) {
+            // validação de mimetype usando a string isolada
+            if (!ALLOWED_MIMES.contains(contentType)) {
                 throw new BadRequestException("Invalid file type. Use JPG, PNG or WebP.");
             }
 
@@ -38,8 +37,8 @@ public class MultiPartService {
                 Files.createDirectories(directoryPath);
             }
 
-            // carrega e processa o arquivo de imagem a partir da stream do arquivo
-            ImmutableImage image = ImmutableImage.loader().fromStream(file.getInputStream());
+            // carrega e processa o arquivo de imagem diretamente da memória
+            ImmutableImage image = ImmutableImage.loader().fromBytes(fileBytes);
 
             // redimensiona e converte para .webp com o WebpWriter
             image.scaleToWidth(targetWidth)
