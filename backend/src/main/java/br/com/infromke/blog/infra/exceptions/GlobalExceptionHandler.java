@@ -115,6 +115,19 @@ public class GlobalExceptionHandler {
 
     /* EXCEÇÕES PERSONALIZADAS */
 
+    // lida com REQUISIÇÕES MAL-FORMATADAS
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex,
+                                                               HttpServletRequest request) {
+        return ErrorResponse.build(
+                "about:blank",
+                HttpStatus.BAD_REQUEST,
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+    }
+
     // lida com RESTRIÇÃO DE ACESSO
     @ExceptionHandler(ForbiddenActionException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenAction(ForbiddenActionException ex,

@@ -1,5 +1,6 @@
 package br.com.infromke.blog.session;
 
+import br.com.infromke.blog.infra.exceptions.BadRequestException;
 import br.com.infromke.blog.infra.services.TokenService;
 import br.com.infromke.blog.session.dto.LoginRequestDTO;
 import br.com.infromke.blog.session.dto.LoginResponse;
@@ -26,7 +27,7 @@ public class SessionService {
         User user = userService.findByEmailForAuth(data.email());
 
         if (!passwordEncoder.matches(data.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new BadRequestException("Invalid credentials");
         }
 
         String token = tokenService.generateToken(user);

@@ -1,5 +1,6 @@
 package br.com.infromke.blog.user;
 
+import br.com.infromke.blog.infra.exceptions.BadRequestException;
 import br.com.infromke.blog.infra.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.infra.exceptions.ResourceAlreadyExistsException;
 import br.com.infromke.blog.infra.exceptions.ResourceNotFoundException;
@@ -53,7 +54,7 @@ public class UserService {
 
     public User findByEmailForAuth(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new BadRequestException("Invalid credentials"));
     }
 
     @Transactional
@@ -66,7 +67,7 @@ public class UserService {
 
         // verifica se as senhas correspondem
         if (!data.password().equals(data.confirmPassword())) {
-            throw new RuntimeException("Passwords must match each other");
+            throw new BadRequestException("Passwords must match each other");
         }
 
         User newUser = new User();
@@ -110,7 +111,7 @@ public class UserService {
         if (data.password() != null) {
             // verifica se as senhas correspondem
             if (!data.password().equals(data.confirmPassword())) {
-                throw new RuntimeException("Passwords must match each other");
+                throw new BadRequestException("Passwords must match each other");
             }
             user.setPassword(passwordEncoder.encode(data.password()));
         }
