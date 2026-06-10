@@ -99,9 +99,10 @@ public class PostController {
 
     @PostMapping // POST /posts
     @RateLimit(type = RateLimitType.POST_CREATION)
+    @PreAuthorize("hasRole('AUTHOR') or hasRole('ADMIN')")
     @Operation(summary = "Cria uma nova publicação", description = "Vincula uma publicação a um " +
-            "autor existente usando o ID do usuário autenticado")
-    @PreAuthorize("hasRole('ADMIN')")
+            "autor existente usando o ID do usuário autenticado. Apenas autores e administradores" +
+            " podem realizar essa operação")
     public ResponseEntity<Object> createPost(@Valid @RequestBody PostCreateDTO data,
                                              HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
