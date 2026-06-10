@@ -20,8 +20,8 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(columnDefinition = "TEXT", nullable = false, length = 150)
-    @Size(min = 1, max = 150)
+    @Column(columnDefinition = "TEXT", nullable = false)
+    @Size(min = 1, max = 360)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
