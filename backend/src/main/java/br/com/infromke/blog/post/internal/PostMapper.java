@@ -3,7 +3,11 @@ package br.com.infromke.blog.post.internal;
 import br.com.infromke.blog.post.dto.PostDetailsDTO;
 import br.com.infromke.blog.user.dto.UserSummaryDTO;
 
-public class PostMapper {
+public final class PostMapper {
+
+    private PostMapper() {
+        throw new UnsupportedOperationException("PostMapper is an utility class and cannot be instantiated");
+    }
 
     public static PostDetailsDTO toDetailsDTO(Post post) {
         if (post == null) return null;

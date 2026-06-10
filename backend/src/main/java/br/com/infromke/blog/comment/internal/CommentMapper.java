@@ -4,7 +4,11 @@ import br.com.infromke.blog.comment.dto.CommentDetailsDTO;
 import br.com.infromke.blog.post.dto.PostSummaryDTO;
 import br.com.infromke.blog.user.dto.UserSummaryDTO;
 
-public class CommentMapper {
+public final class CommentMapper {
+
+    private CommentMapper() {
+        throw new UnsupportedOperationException("CommentMapper is an utility class and cannot be instantiated");
+    }
 
     public static CommentDetailsDTO toDetailsDTO(Comment comment) {
         if (comment == null) return null;

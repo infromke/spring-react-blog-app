@@ -3,7 +3,12 @@ package br.com.infromke.blog.infra.utils;
 import java.text.Normalizer;
 import java.util.UUID;
 
-public class SlugGenerator {
+public final class SlugGenerator {
+
+    private SlugGenerator() {
+        throw new UnsupportedOperationException("SlugGenerator is an utility class and cannot be instantiated");
+    }
+
     public static String generate(String input) {
         if (input == null || input.isBlank()) {
             return UUID.randomUUID().toString().split("-")[0];
