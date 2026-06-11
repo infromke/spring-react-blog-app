@@ -11,7 +11,7 @@ public final class SlugGenerator {
 
     public static String generate(String input) {
         if (input == null || input.isBlank()) {
-            return UUID.randomUUID().toString().split("-")[0];
+            return UUID.randomUUID().toString().split("-")[0]; // retorna apenas o UUID
         }
 
         // remove acentos da string e a normaliza para letras puras
@@ -25,5 +25,19 @@ public final class SlugGenerator {
 
         String shortId = UUID.randomUUID().toString().split("-")[0];
         return baseSlug + "-" + shortId;
+    }
+
+    public static String generateForUser(String fullName) {
+        if (fullName == null || fullName.isBlank()) {
+            return generate(null);
+        }
+
+        String[] names = fullName.trim().split("\\s+"); // desconsidera espaços extras
+        String slugInput = (names.length > 1)
+                ? names[0] + " " + names[names.length - 1]
+                : names[0];
+
+        // cria nome-e-uuid OU nome-sobrenome-e-uuid
+        return generate(slugInput);
     }
 }

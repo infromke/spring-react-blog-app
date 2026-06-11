@@ -5,6 +5,7 @@ import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.shared.exceptions.ResourceAlreadyExistsException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
 import br.com.infromke.blog.shared.helpers.ImageStorageHelper;
+import br.com.infromke.blog.shared.utils.SlugGenerator;
 import br.com.infromke.blog.user.dto.UserCreateDto;
 import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.dto.UserUpdateDto;
@@ -115,20 +116,15 @@ public class UserService {
 
         User user = findEntityById(id);
 
-        // altera nome se "name" não for null
+        // altera nome se "name" não for null e também altera o slug
         if (dto.name() != null && !dto.name().equals(user.getName())) {
             user.setName(dto.name());
-
-            // altera o slug do usuário de acordo com a mudança de nome
-            String baseSlug = dto.name().toLowerCase().replaceAll("[^a-z0-9]", "-");
-            String shortId = UUID.randomUUID().toString().split("-")[0];
-            user.setSlug(baseSlug + "-" + shortId);
+            user.setSlug(SlugGenerator.generateForUser(dto.name()));
         }
 
-        // altera e-mail se "email" não for null
+        // altera e-mail se "email" não for null e se o e-mail estiver disponível
         if (dto.email() != null && !dto.email().equals(user.getEmail())) {
             if (userRepository.findByEmail(dto.email()).isPresent()) {
-                // verifica se o usuário já existe
                 throw new ResourceAlreadyExistsException("This e-mail already exists");
             }
             user.setEmail(dto.email());
@@ -136,7 +132,6 @@ public class UserService {
 
         // altera senha se "password" não for null
         if (dto.password() != null) {
-            // verifica se as senhas correspondem
             if (!dto.password().equals(dto.confirmPassword())) {
                 throw new BadRequestException("Passwords must match each other");
             }

@@ -127,14 +127,9 @@ public class User implements UserDetails {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
 
-        // cria um slug único para o usuário (nome-e-uuid OU nome-sobrenome-e-uuid)
+        // cria um slug único para o usuário
         if (this.slug == null || this.slug.isEmpty()) {
-            String[] names = this.name.trim().split("\\s+"); // desconsidera espaços extras
-            String slugInput = (names.length > 1)
-                    ? names[0] + " " + names[names.length - 1]
-                    : names[0];
-
-            this.slug = SlugGenerator.generate(slugInput);
+            this.slug = SlugGenerator.generateForUser(this.name);
         }
 
         // atribui um avatar ao usuário a partir do seu primeiro nome
