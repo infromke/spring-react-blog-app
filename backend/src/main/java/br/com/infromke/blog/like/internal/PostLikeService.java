@@ -25,7 +25,7 @@ public class PostLikeService {
 
     @Transactional
     public boolean toggleLike(UUID postId, UUID userId) {
-        Post post = postService.findById(postId);
+        Post post = postService.findEntityById(postId);
 
         // verifica se um like já foi dado pelo usuário no post
         var existingLike = postLikeRepository.findByUserIdAndPostId(userId, postId);
@@ -37,7 +37,7 @@ public class PostLikeService {
         }
 
         // cria o like caso ele não exista
-        User user = userService.findById(userId);
+        User user = userService.findEntityById(userId);
 
         var newLike = PostLike.builder()
                 .post(post)

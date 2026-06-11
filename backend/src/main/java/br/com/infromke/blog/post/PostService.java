@@ -1,5 +1,7 @@
 package br.com.infromke.blog.post;
 
+import br.com.infromke.blog.post.dto.PostDetailsDto;
+import br.com.infromke.blog.post.internal.PostMapper;
 import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
 import br.com.infromke.blog.shared.helpers.ImageStorageHelper;
@@ -34,32 +36,42 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> findAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable);
+    public Page<PostDetailsDto> findAllPosts(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+        return posts.map(post -> PostMapper.toDetailsDto(post));
     }
 
     @Transactional(readOnly = true)
-    public Post findById(UUID id) {
-        return postRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Post " +
-                "not found"));
+    public Post findEntityById(UUID id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public PostDetailsDto getDetailsById(UUID id) {
+        Post post = findEntityById(id);
+        return PostMapper.toDetailsDto(post);
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "posts", key = "#postSlug")
-    public Post findBySlug(String postSlug) {
-        return postRepository.findBySlug(postSlug).orElseThrow(() -> new ResourceNotFoundException(
-                "Post not found"));
+    public PostDetailsDto findBySlug(String postSlug) {
+        Post post = postRepository.findBySlug(postSlug)
+                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        return PostMapper.toDetailsDto(post);
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "authors", key = "#authorSlug")
-    public Page<Post> findByAuthor(String authorSlug, Pageable pageable) {
-        return postRepository.findAllByAuthorSlug(authorSlug, pageable);
+    public Page<PostDetailsDto> findByAuthor(String authorSlug, Pageable pageable) {
+        Page<Post> posts = postRepository.findAllByAuthorSlug(authorSlug, pageable);
+        return posts.map(post -> PostMapper.toDetailsDto(post));
     }
 
     @Transactional(readOnly = true)
-    public Page<Post> findByTitle(String title, Pageable pageable) {
-        return postRepository.findByTitleContainingIgnoreCase(title, pageable);
+    public Page<PostDetailsDto> findByTitle(String title, Pageable pageable) {
+        Page<Post> posts = postRepository.findByTitleContainingIgnoreCase(title, pageable);
+        return posts.map(post -> PostMapper.toDetailsDto(post));
     }
 
     @Transactional
@@ -67,21 +79,17 @@ public class PostService {
             @CacheEvict(value = "posts", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)
     })
-    public Post createPost(PostCreateDto data, UUID authorId) {
-        User author = userService.findById(authorId);
-
-        if (author == null) {
-            throw new ResourceNotFoundException("Author not found");
-        }
+    public PostDetailsDto createPost(PostCreateDto dto, UUID authorId) {
+        User author = userService.findEntityById(authorId);
 
         Post post = new Post();
-
-        post.setTitle(data.title());
-        post.setSummary(data.summary());
-        post.setContent(data.content());
+        post.setTitle(dto.title());
+        post.setSummary(dto.summary());
+        post.setContent(dto.content());
         post.setAuthor(author);
 
-        return postRepository.save(post);
+        postRepository.save(post);
+        return getDetailsById(post.getId());
     }
 
     @Transactional
@@ -89,27 +97,27 @@ public class PostService {
             @CacheEvict(value = "posts", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)
     })
-    public Post updatePost(UUID postId, UUID authenticatedUserId, PostUpdateDto data) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+    public PostDetailsDto updatePost(UUID postId, UUID authenticatedUserId, PostUpdateDto dto) {
+        Post post = findEntityById(postId);
 
         if (!post.getAuthor().getId().equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this post");
         }
 
-        if (data.title() != null) {
-            post.setTitle(data.title());
+        if (dto.title() != null) {
+            post.setTitle(dto.title());
         }
 
-        if (data.summary() != null) {
-            post.setSummary(data.summary());
+        if (dto.summary() != null) {
+            post.setSummary(dto.summary());
         }
 
-        if (data.content() != null) {
-            post.setContent(data.content());
+        if (dto.content() != null) {
+            post.setContent(dto.content());
         }
 
-        return postRepository.save(post);
+        postRepository.save(post);
+        return getDetailsById(post.getId());
     }
 
     @Transactional
@@ -119,8 +127,7 @@ public class PostService {
     })
     public void updateBanner(UUID id, UUID authenticatedUserId, byte[] fileBytes,
                              String contentType) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        Post post = findEntityById(id);
 
         if (!post.getAuthor().getId().equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this post");
@@ -149,8 +156,7 @@ public class PostService {
             @CacheEvict(value = "authors", allEntries = true)
     })
     public void deletePost(UUID id, UUID authenticatedUserId) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
+        Post post = findEntityById(id);
 
         if (!post.getAuthor().getId().equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this post");

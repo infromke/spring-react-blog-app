@@ -6,6 +6,7 @@ import br.com.infromke.blog.shared.exceptions.ResourceAlreadyExistsException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
 import br.com.infromke.blog.shared.helpers.ImageStorageHelper;
 import br.com.infromke.blog.user.dto.UserCreateDto;
+import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.dto.UserUpdateDto;
 import br.com.infromke.blog.user.internal.User;
 import br.com.infromke.blog.user.internal.UserRepository;
@@ -36,21 +37,47 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<User> findAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<UserDto> findAllUsers(Pageable pageable) {
+        Page<User> usersPage = userRepository.findAll(pageable);
+
+        return usersPage.map(user ->
+                new UserDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getAvatar(),
+                        user.getSlug(),
+                        user.getRole()
+                )
+        );
     }
 
     @Transactional(readOnly = true)
-    public User findById(UUID id) {
+    public User findEntityById(UUID id){
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional(readOnly = true)
+    public UserDto getSummaryById(UUID id) {
+        User user = findEntityById(id);
+
+        return new UserDto(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getAvatar(),
+                user.getSlug(),
+                user.getRole()
+        );
+    }
+
+    @Transactional(readOnly = true)
     @Cacheable(value = "profiles", key = "#userSlug")
-    public User findBySlug(String userSlug) {
-        return userRepository.findBySlug(userSlug)
+    public UserDto findBySlug(String userSlug) {
+        User user = userRepository.findBySlug(userSlug)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return getSummaryById(user.getId());
     }
 
     public User findByEmailForAuth(String email) {
@@ -59,65 +86,65 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(UserCreateDto data) {
-
+    public UserDto createUser(UserCreateDto dto) {
         // verifica se o usuário já existe
-        if (userRepository.findByEmail(data.email()).isPresent()) {
+        if (userRepository.findByEmail(dto.email()).isPresent()) {
             throw new ResourceAlreadyExistsException("This e-mail already exists");
         }
 
         // verifica se as senhas correspondem
-        if (!data.password().equals(data.confirmPassword())) {
+        if (!dto.password().equals(dto.confirmPassword())) {
             throw new BadRequestException("Passwords must match each other");
         }
 
         User newUser = new User();
-        newUser.setName(data.name());
-        newUser.setEmail(data.email());
-        newUser.setPassword(passwordEncoder.encode(data.password()));
+        newUser.setName(dto.name());
+        newUser.setEmail(dto.email());
+        newUser.setPassword(passwordEncoder.encode(dto.password()));
 
-        return userRepository.save(newUser);
+        userRepository.save(newUser);
+        return getSummaryById(newUser.getId());
     }
 
     @Transactional
     @CacheEvict(value = "profiles", allEntries = true)
-    public User updateUser(UUID id, UUID authenticatedUserId, UserUpdateDto data) {
+    public UserDto updateUser(UUID id, UUID authenticatedUserId, UserUpdateDto dto) {
         if (!id.equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this account");
         }
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = findEntityById(id);
 
         // altera nome se "name" não for null
-        if (data.name() != null && !data.name().equals(user.getName())) {
-            user.setName(data.name());
+        if (dto.name() != null && !dto.name().equals(user.getName())) {
+            user.setName(dto.name());
 
             // altera o slug do usuário de acordo com a mudança de nome
-            String baseSlug = data.name().toLowerCase().replaceAll("[^a-z0-9]", "-");
+            String baseSlug = dto.name().toLowerCase().replaceAll("[^a-z0-9]", "-");
             String shortId = UUID.randomUUID().toString().split("-")[0];
             user.setSlug(baseSlug + "-" + shortId);
         }
 
         // altera e-mail se "email" não for null
-        if (data.email() != null && !data.email().equals(user.getEmail())) {
-            if (userRepository.findByEmail(data.email()).isPresent()) {
+        if (dto.email() != null && !dto.email().equals(user.getEmail())) {
+            if (userRepository.findByEmail(dto.email()).isPresent()) {
                 // verifica se o usuário já existe
                 throw new ResourceAlreadyExistsException("This e-mail already exists");
             }
-            user.setEmail(data.email());
+            user.setEmail(dto.email());
         }
 
         // altera senha se "password" não for null
-        if (data.password() != null) {
+        if (dto.password() != null) {
             // verifica se as senhas correspondem
-            if (!data.password().equals(data.confirmPassword())) {
+            if (!dto.password().equals(dto.confirmPassword())) {
                 throw new BadRequestException("Passwords must match each other");
             }
-            user.setPassword(passwordEncoder.encode(data.password()));
+            user.setPassword(passwordEncoder.encode(dto.password()));
         }
 
-        return userRepository.save(user);
+        userRepository.save(user);
+        return getSummaryById(id);
     }
 
     @Transactional
@@ -128,8 +155,7 @@ public class UserService {
             throw new ForbiddenActionException("You are not authorized to modify this account");
         }
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = findEntityById(id);
 
         // deleta a imagem antiga se ela existir e não for um link (pra salvar espaço)
         if (user.getAvatar() != null && !user.getAvatar().startsWith("http")) {
@@ -150,8 +176,7 @@ public class UserService {
 
     @Transactional
     public void updateUserRole(UUID id, UserRole newRole) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = findEntityById(id);
         user.setRole(newRole);
         userRepository.save(user);
     }
@@ -166,8 +191,7 @@ public class UserService {
             throw new ForbiddenActionException("You are not authorized to modify this account");
         }
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = findEntityById(id);
 
         // deleta o avatar do usuário se uma imagem física existir
         if (user.getAvatar() != null && !user.getAvatar().startsWith("http")) {

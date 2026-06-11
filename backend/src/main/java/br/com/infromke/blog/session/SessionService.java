@@ -5,6 +5,7 @@ import br.com.infromke.blog.shared.services.TokenService;
 import br.com.infromke.blog.session.dto.LoginRequestDto;
 import br.com.infromke.blog.session.dto.LoginResponse;
 import br.com.infromke.blog.user.UserService;
+import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.internal.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,15 @@ public class SessionService {
     }
 
     public LoginResponse authenticate(LoginRequestDto data) {
-        User user = userService.findByEmailForAuth(data.email());
+        User rawUser = userService.findByEmailForAuth(data.email());
 
-        if (!passwordEncoder.matches(data.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(data.password(), rawUser.getPassword())) {
             throw new BadRequestException("Invalid credentials");
         }
 
-        String token = tokenService.generateToken(user);
-        return new LoginResponse(token, user);
+        String token = tokenService.generateToken(rawUser);
+        UserDto formattedUser = userService.getSummaryById(rawUser.getId());
+
+        return new LoginResponse(token, formattedUser);
     }
 }

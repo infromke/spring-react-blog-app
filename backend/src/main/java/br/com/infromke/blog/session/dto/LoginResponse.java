@@ -1,6 +1,6 @@
 package br.com.infromke.blog.session.dto;
 
-import br.com.infromke.blog.user.internal.User;
+import br.com.infromke.blog.user.dto.UserDto;
 
-public record LoginResponse(String token, User user) {
+public record LoginResponse(String token, UserDto user) {
 }

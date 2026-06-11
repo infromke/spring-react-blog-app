@@ -1,8 +1,10 @@
 package br.com.infromke.blog.comment;
 
 import br.com.infromke.blog.comment.dto.CommentCreateDto;
+import br.com.infromke.blog.comment.dto.CommentDetailsDto;
 import br.com.infromke.blog.comment.dto.CommentUpdateDto;
 import br.com.infromke.blog.comment.internal.Comment;
+import br.com.infromke.blog.comment.internal.CommentMapper;
 import br.com.infromke.blog.comment.internal.CommentRepository;
 import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
@@ -31,52 +33,57 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Comment> findAllByPostId(UUID postId, Pageable pageable) {
-        postService.findById(postId);
-        return commentRepository.findAllByPostId(postId, pageable);
+    public Page<CommentDetailsDto> findAllByPostId(UUID postId, Pageable pageable) {
+        Post post = postService.findEntityById(postId);
+        Page<Comment> comments = commentRepository.findAllByPostId(post.getId(), pageable);
+        return comments.map(comment -> CommentMapper.toDetailsDto(comment));
     }
 
     @Transactional(readOnly = true)
-    public Comment findById(UUID id) {
-        return commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(
-                "Comment not found"));
+    public Comment findEntityById(UUID id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public CommentDetailsDto getDetailsById(UUID id) {
+        Comment comment = findEntityById(id);
+        return CommentMapper.toDetailsDto(comment);
     }
 
     @Transactional
-    public Comment createComment(UUID postId, CommentCreateDto data, UUID authenticatedUserId) {
-        Post post = postService.findById(postId);
-        User author = userService.findById(authenticatedUserId);
+    public CommentDetailsDto createComment(UUID postId, CommentCreateDto dto, UUID authenticatedUserId) {
+        Post post = postService.findEntityById(postId);
+        User author = userService.findEntityById(authenticatedUserId);
 
         Comment comment = new Comment();
-        comment.setContent(data.content());
+        comment.setContent(dto.content());
         comment.setPost(post);
         comment.setAuthor(author);
 
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
+        return getDetailsById(comment.getId());
     }
 
     @Transactional
-    public Comment updateComment(UUID commentId, CommentUpdateDto data, UUID authenticatedUserId) {
-        Comment comment =
-                commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException(
-                        "Comment not found"));
+    public CommentDetailsDto updateComment(UUID commentId, CommentUpdateDto dto, UUID authenticatedUserId) {
+        Comment comment = findEntityById(commentId);
 
         if (!comment.getAuthor().getId().equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this comment");
         }
 
-        if(data.content() != null) {
-            comment.setContent(data.content());
+        if(dto.content() != null) {
+            comment.setContent(dto.content());
         }
 
-        return commentRepository.save(comment);
+        commentRepository.save(comment);
+        return getDetailsById(comment.getId());
     }
 
     @Transactional
     public void deleteComment(UUID commentId, UUID authenticatedUserId) {
-        Comment comment =
-                commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException(
-                "Comment not found"));
+        Comment comment = findEntityById(commentId);
 
         if (!comment.getAuthor().getId().equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this comment");
