@@ -1,7 +1,7 @@
 package br.com.infromke.blog.session;
 
-import br.com.infromke.blog.infra.exceptions.BadRequestException;
-import br.com.infromke.blog.infra.services.TokenService;
+import br.com.infromke.blog.shared.exceptions.BadRequestException;
+import br.com.infromke.blog.shared.services.TokenService;
 import br.com.infromke.blog.session.dto.LoginRequestDTO;
 import br.com.infromke.blog.session.dto.LoginResponse;
 import br.com.infromke.blog.user.UserService;

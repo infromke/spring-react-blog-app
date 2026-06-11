@@ -1,12 +1,11 @@
 package br.com.infromke.blog.user;
 
-import br.com.infromke.blog.infra.exceptions.BadRequestException;
-import br.com.infromke.blog.infra.exceptions.ForbiddenActionException;
-import br.com.infromke.blog.infra.exceptions.ResourceAlreadyExistsException;
-import br.com.infromke.blog.infra.exceptions.ResourceNotFoundException;
-import br.com.infromke.blog.infra.services.MultiPartService;
+import br.com.infromke.blog.shared.exceptions.BadRequestException;
+import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
+import br.com.infromke.blog.shared.exceptions.ResourceAlreadyExistsException;
+import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
+import br.com.infromke.blog.shared.services.MultiPartService;
 import br.com.infromke.blog.user.dto.UserCreateDTO;
-import br.com.infromke.blog.user.dto.UserRoleUpdateDTO;
 import br.com.infromke.blog.user.dto.UserUpdateDTO;
 import br.com.infromke.blog.user.internal.User;
 import br.com.infromke.blog.user.internal.UserRepository;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 

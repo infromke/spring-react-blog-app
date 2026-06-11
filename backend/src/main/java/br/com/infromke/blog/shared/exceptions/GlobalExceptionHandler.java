@@ -1,6 +1,6 @@
-package br.com.infromke.blog.infra.exceptions;
+package br.com.infromke.blog.shared.exceptions;
 
-import br.com.infromke.blog.infra.utils.ExceptionStackGenerator;
+import br.com.infromke.blog.shared.utils.ExceptionStackGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;

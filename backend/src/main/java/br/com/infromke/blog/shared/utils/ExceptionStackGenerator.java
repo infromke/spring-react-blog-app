@@ -1,4 +1,4 @@
-package br.com.infromke.blog.infra.utils;
+package br.com.infromke.blog.shared.utils;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

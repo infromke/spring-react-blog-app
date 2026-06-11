@@ -1,7 +1,7 @@
 package br.com.infromke.blog.like;
 
-import br.com.infromke.blog.infra.ratelimit.RateLimit;
-import br.com.infromke.blog.infra.ratelimit.RateLimitType;
+import br.com.infromke.blog.shared.ratelimit.RateLimit;
+import br.com.infromke.blog.shared.ratelimit.RateLimitType;
 import br.com.infromke.blog.like.internal.PostLikeService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;

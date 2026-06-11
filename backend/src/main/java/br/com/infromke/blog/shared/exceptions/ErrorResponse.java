@@ -1,4 +1,4 @@
-package br.com.infromke.blog.infra.exceptions;
+package br.com.infromke.blog.shared.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.http.HttpStatus;

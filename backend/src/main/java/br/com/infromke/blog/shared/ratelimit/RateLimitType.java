@@ -1,4 +1,4 @@
-package br.com.infromke.blog.infra.ratelimit;
+package br.com.infromke.blog.shared.ratelimit;
 
 import lombok.Getter;
 

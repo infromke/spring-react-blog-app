@@ -1,4 +1,4 @@
-package br.com.infromke.blog.infra.utils;
+package br.com.infromke.blog.shared.utils;
 
 import java.text.Normalizer;
 import java.util.UUID;

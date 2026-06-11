@@ -1,6 +1,6 @@
-package br.com.infromke.blog.infra.ratelimit;
+package br.com.infromke.blog.shared.ratelimit;
 
-import br.com.infromke.blog.infra.exceptions.RateLimitExceededException;
+import br.com.infromke.blog.shared.exceptions.RateLimitExceededException;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
 import jakarta.servlet.http.HttpServletRequest;

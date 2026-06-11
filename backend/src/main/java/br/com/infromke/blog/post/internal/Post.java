@@ -1,7 +1,7 @@
 package br.com.infromke.blog.post.internal;
 
 import br.com.infromke.blog.comment.internal.Comment;
-import br.com.infromke.blog.infra.utils.SlugGenerator;
+import br.com.infromke.blog.shared.utils.SlugGenerator;
 import br.com.infromke.blog.like.internal.PostLike;
 import br.com.infromke.blog.user.internal.User;
 import jakarta.persistence.*;

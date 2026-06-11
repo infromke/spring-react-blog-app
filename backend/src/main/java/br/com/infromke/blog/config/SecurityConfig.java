@@ -1,7 +1,7 @@
 package br.com.infromke.blog.config;
 
-import br.com.infromke.blog.infra.security.CustomAccessDeniedHandler;
-import br.com.infromke.blog.infra.security.CustomAuthenticationEntryPoint;
+import br.com.infromke.blog.shared.security.CustomAccessDeniedHandler;
+import br.com.infromke.blog.shared.security.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

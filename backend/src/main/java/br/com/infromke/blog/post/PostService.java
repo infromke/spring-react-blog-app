@@ -1,8 +1,8 @@
 package br.com.infromke.blog.post;
 
-import br.com.infromke.blog.infra.exceptions.ForbiddenActionException;
-import br.com.infromke.blog.infra.exceptions.ResourceNotFoundException;
-import br.com.infromke.blog.infra.services.MultiPartService;
+import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
+import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
+import br.com.infromke.blog.shared.services.MultiPartService;
 import br.com.infromke.blog.post.dto.PostCreateDTO;
 import br.com.infromke.blog.post.dto.PostUpdateDTO;
 import br.com.infromke.blog.post.internal.Post;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package br.com.infromke.blog.infra.services;
+package br.com.infromke.blog.shared.services;
 
 import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.webp.WebpWriter;

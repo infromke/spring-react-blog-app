@@ -1,4 +1,4 @@
-package br.com.infromke.blog.infra.exceptions;
+package br.com.infromke.blog.shared.exceptions;
 
 public class ForbiddenActionException extends RuntimeException {
     public ForbiddenActionException(String message) {

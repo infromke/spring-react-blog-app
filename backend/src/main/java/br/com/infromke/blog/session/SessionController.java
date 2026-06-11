@@ -1,7 +1,7 @@
 package br.com.infromke.blog.session;
 
-import br.com.infromke.blog.infra.ratelimit.RateLimit;
-import br.com.infromke.blog.infra.ratelimit.RateLimitType;
+import br.com.infromke.blog.shared.ratelimit.RateLimit;
+import br.com.infromke.blog.shared.ratelimit.RateLimitType;
 import br.com.infromke.blog.session.dto.LoginRequestDTO;
 import br.com.infromke.blog.session.dto.LoginResponse;
 import br.com.infromke.blog.user.dto.UserDTO;

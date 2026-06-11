@@ -1,6 +1,6 @@
 package br.com.infromke.blog.config;
 
-import br.com.infromke.blog.infra.services.TokenService;
+import br.com.infromke.blog.shared.services.TokenService;
 import br.com.infromke.blog.user.internal.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,4 +1,4 @@
-package br.com.infromke.blog.infra.services;
+package br.com.infromke.blog.shared.services;
 
 import br.com.infromke.blog.user.internal.User;
 import com.auth0.jwt.JWT;
