@@ -9,6 +9,9 @@ import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.internal.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 public class SessionService {
@@ -22,6 +25,10 @@ public class SessionService {
         this.userService = userService;
         this.tokenService = tokenService;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public UserDto showStatus(UUID id) {
+        return userService.getSummaryById(id);
     }
 
     public LoginResponse authenticate(LoginRequestDto data) {

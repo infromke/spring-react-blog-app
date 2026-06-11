@@ -5,7 +5,6 @@ import br.com.infromke.blog.shared.ratelimit.RateLimitType;
 import br.com.infromke.blog.session.dto.LoginRequestDto;
 import br.com.infromke.blog.session.dto.LoginResponse;
 import br.com.infromke.blog.user.dto.UserDto;
-import br.com.infromke.blog.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,11 +22,9 @@ import java.util.UUID;
 public class SessionController {
 
     private final SessionService sessionService;
-    private final UserService userService;
 
-    public SessionController(SessionService sessionService, UserService userService) {
+    public SessionController(SessionService sessionService) {
         this.sessionService = sessionService;
-        this.userService = userService;
     }
 
     // GET /sessions/me
@@ -36,7 +33,7 @@ public class SessionController {
             "do usuário atualmente autenticado")
     public ResponseEntity<Object> me(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recupera o ID do usuário
-        UserDto user = userService.getSummaryById(UUID.fromString(userId));
+        UserDto user = sessionService.showStatus(UUID.fromString(userId));
         return ResponseEntity.ok(user);
     }
 
