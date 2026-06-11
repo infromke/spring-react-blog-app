@@ -1,18 +1,18 @@
 package br.com.infromke.blog.post.dto;
 
-import br.com.infromke.blog.user.dto.UserSummaryDTO;
+import br.com.infromke.blog.user.dto.UserSummaryDto;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record PostDetailsDTO(
+public record PostDetailsDto(
         UUID id,
         String title,
         String summary,
         String content,
         String banner,
         String slug,
-        UserSummaryDTO author,
+        UserSummaryDto author,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {

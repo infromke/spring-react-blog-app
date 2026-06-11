@@ -5,8 +5,8 @@ import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.shared.exceptions.ResourceAlreadyExistsException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
 import br.com.infromke.blog.shared.helpers.ImageStorageHelper;
-import br.com.infromke.blog.user.dto.UserCreateDTO;
-import br.com.infromke.blog.user.dto.UserUpdateDTO;
+import br.com.infromke.blog.user.dto.UserCreateDto;
+import br.com.infromke.blog.user.dto.UserUpdateDto;
 import br.com.infromke.blog.user.internal.User;
 import br.com.infromke.blog.user.internal.UserRepository;
 import br.com.infromke.blog.user.internal.UserRole;
@@ -59,7 +59,7 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(UserCreateDTO data) {
+    public User createUser(UserCreateDto data) {
 
         // verifica se o usuário já existe
         if (userRepository.findByEmail(data.email()).isPresent()) {
@@ -81,7 +81,7 @@ public class UserService {
 
     @Transactional
     @CacheEvict(value = "profiles", allEntries = true)
-    public User updateUser(UUID id, UUID authenticatedUserId, UserUpdateDTO data) {
+    public User updateUser(UUID id, UUID authenticatedUserId, UserUpdateDto data) {
         if (!id.equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this account");
         }

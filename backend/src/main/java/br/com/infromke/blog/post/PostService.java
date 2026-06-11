@@ -3,8 +3,8 @@ package br.com.infromke.blog.post;
 import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
 import br.com.infromke.blog.shared.helpers.ImageStorageHelper;
-import br.com.infromke.blog.post.dto.PostCreateDTO;
-import br.com.infromke.blog.post.dto.PostUpdateDTO;
+import br.com.infromke.blog.post.dto.PostCreateDto;
+import br.com.infromke.blog.post.dto.PostUpdateDto;
 import br.com.infromke.blog.post.internal.Post;
 import br.com.infromke.blog.post.internal.PostRepository;
 import br.com.infromke.blog.user.UserService;
@@ -67,7 +67,7 @@ public class PostService {
             @CacheEvict(value = "posts", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)
     })
-    public Post createPost(PostCreateDTO data, UUID authorId) {
+    public Post createPost(PostCreateDto data, UUID authorId) {
         User author = userService.findById(authorId);
 
         if (author == null) {
@@ -89,7 +89,7 @@ public class PostService {
             @CacheEvict(value = "posts", allEntries = true),
             @CacheEvict(value = "authors", allEntries = true)
     })
-    public Post updatePost(UUID postId, UUID authenticatedUserId, PostUpdateDTO data) {
+    public Post updatePost(UUID postId, UUID authenticatedUserId, PostUpdateDto data) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 

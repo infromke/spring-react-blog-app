@@ -2,9 +2,9 @@ package br.com.infromke.blog.post;
 
 import br.com.infromke.blog.shared.ratelimit.RateLimit;
 import br.com.infromke.blog.shared.ratelimit.RateLimitType;
-import br.com.infromke.blog.post.dto.PostCreateDTO;
-import br.com.infromke.blog.post.dto.PostDetailsDTO;
-import br.com.infromke.blog.post.dto.PostUpdateDTO;
+import br.com.infromke.blog.post.dto.PostCreateDto;
+import br.com.infromke.blog.post.dto.PostDetailsDto;
+import br.com.infromke.blog.post.dto.PostUpdateDto;
 import br.com.infromke.blog.post.internal.Post;
 import br.com.infromke.blog.post.internal.PostMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,8 +41,8 @@ public class PostController {
             direction = Sort.Direction.DESC) Pageable pageable) {
         Page<Post> postsPage = postService.findAllPosts(pageable);
 
-        Page<PostDetailsDTO> dtoPage = postsPage.map(
-                post -> PostMapper.toDetailsDTO(post)
+        Page<PostDetailsDto> dtoPage = postsPage.map(
+                post -> PostMapper.toDetailsDto(post)
         );
 
         return ResponseEntity.ok(dtoPage);
@@ -53,7 +53,7 @@ public class PostController {
             "básicos da publicação associada ao ID providenciado")
     public ResponseEntity<Object> getPostById(@PathVariable UUID id) {
         Post post = postService.findById(id);
-        return ResponseEntity.ok(PostMapper.toDetailsDTO(post));
+        return ResponseEntity.ok(PostMapper.toDetailsDto(post));
     }
 
     @GetMapping("/slug/{postSlug}") // GET posts/slug/postSlug
@@ -61,7 +61,7 @@ public class PostController {
             "dados básicos da publicação associada ao slug providenciado")
     public ResponseEntity<Object> getPostBySlug(@PathVariable String postSlug) {
         Post post = postService.findBySlug(postSlug);
-        return ResponseEntity.ok(PostMapper.toDetailsDTO(post));
+        return ResponseEntity.ok(PostMapper.toDetailsDto(post));
     }
 
     @GetMapping("/author/{authorSlug}") // GET /posts/author/authorSlug
@@ -73,8 +73,8 @@ public class PostController {
                                                               Sort.Direction.DESC) Pageable pageable) {
         Page<Post> postsPage = postService.findByAuthor(authorSlug, pageable);
 
-        Page<PostDetailsDTO> dtoPage = postsPage.map(
-                post -> PostMapper.toDetailsDTO(post)
+        Page<PostDetailsDto> dtoPage = postsPage.map(
+                post -> PostMapper.toDetailsDto(post)
         );
 
         return ResponseEntity.ok(dtoPage);
@@ -90,8 +90,8 @@ public class PostController {
                                                              Sort.Direction.DESC) Pageable pageable) {
         Page<Post> postsPage = postService.findByTitle(title, pageable);
 
-        Page<PostDetailsDTO> dtoPage = postsPage.map(
-                post -> PostMapper.toDetailsDTO(post)
+        Page<PostDetailsDto> dtoPage = postsPage.map(
+                post -> PostMapper.toDetailsDto(post)
         );
 
         return ResponseEntity.ok(dtoPage);
@@ -103,14 +103,14 @@ public class PostController {
     @Operation(summary = "Cria uma nova publicação", description = "Vincula uma publicação a um " +
             "autor existente usando o ID do usuário autenticado. Apenas autores e administradores" +
             " podem realizar essa operação")
-    public ResponseEntity<Object> createPost(@Valid @RequestBody PostCreateDTO data,
+    public ResponseEntity<Object> createPost(@Valid @RequestBody PostCreateDto data,
                                              HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         Post savedPost = postService.createPost(data, UUID.fromString(userId));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(PostMapper.toDetailsDTO(savedPost));
+                .body(PostMapper.toDetailsDto(savedPost));
     }
 
     @PatchMapping("/{id}") // PATCH /posts/{id}
@@ -118,13 +118,13 @@ public class PostController {
             "dados básicos da publicação associada ao ID providenciado")
     public ResponseEntity<Object> updatePost(@PathVariable("id") UUID postId,
                                              HttpServletRequest request,
-                                             @RequestBody PostUpdateDTO updateData) {
+                                             @RequestBody PostUpdateDto updateData) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         Post updatedPost = postService.updatePost(postId, UUID.fromString(userId), updateData);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(PostMapper.toDetailsDTO(updatedPost));
+                .body(PostMapper.toDetailsDto(updatedPost));
     }
 
     @PatchMapping(value = "/{id}/banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

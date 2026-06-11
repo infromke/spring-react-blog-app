@@ -3,7 +3,7 @@ package br.com.infromke.blog.comment.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record CommentCreateDTO(
+public record CommentUpdateDto(
         @NotBlank(message = "Comment cannot be empty")
         @Size(min = 1, max = 360, message = "Comment must be between 1 and 360 characters")
         String content

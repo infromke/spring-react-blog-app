@@ -1,8 +1,8 @@
 package br.com.infromke.blog.comment;
 
-import br.com.infromke.blog.comment.dto.CommentCreateDTO;
-import br.com.infromke.blog.comment.dto.CommentDetailsDTO;
-import br.com.infromke.blog.comment.dto.CommentUpdateDTO;
+import br.com.infromke.blog.comment.dto.CommentCreateDto;
+import br.com.infromke.blog.comment.dto.CommentDetailsDto;
+import br.com.infromke.blog.comment.dto.CommentUpdateDto;
 import br.com.infromke.blog.comment.internal.Comment;
 import br.com.infromke.blog.comment.internal.CommentMapper;
 import br.com.infromke.blog.shared.ratelimit.RateLimit;
@@ -38,8 +38,8 @@ public class CommentController {
                                                          direction = Sort.Direction.DESC) Pageable pageable) {
         Page<Comment> commentsPage = commentService.findAllByPostId(postId, pageable);
 
-        Page<CommentDetailsDTO> dtoPage =
-                commentsPage.map(comment -> CommentMapper.toDetailsDTO(comment));
+        Page<CommentDetailsDto> dtoPage =
+                commentsPage.map(comment -> CommentMapper.toDetailsDto(comment));
 
         return ResponseEntity.ok(dtoPage);
     }
@@ -50,12 +50,12 @@ public class CommentController {
             "post existente usando o ID do usuário autenticado e o ID da publicação")
     public ResponseEntity<Object> createComment(@PathVariable UUID postId,
                                                 HttpServletRequest request,
-                                                @Valid @RequestBody CommentCreateDTO data) {
+                                                @Valid @RequestBody CommentCreateDto data) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
         Comment savedComment = commentService.createComment(postId, data, UUID.fromString(userId));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommentMapper.toDetailsDTO(savedComment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommentMapper.toDetailsDto(savedComment));
     }
 
     @PatchMapping("/{id}") // PATCH /comments/{id}
@@ -63,13 +63,13 @@ public class CommentController {
             "conteúdo do comentário associado ao ID providenciado")
     public ResponseEntity<Object> updateComment(@PathVariable("id") UUID commentId,
                                                 HttpServletRequest request,
-                                                @Valid @RequestBody CommentUpdateDTO updateData) {
+                                                @Valid @RequestBody CommentUpdateDto updateData) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
         Comment updatedComment = commentService.updateComment(commentId, updateData,
                 UUID.fromString(userId));
 
-        return ResponseEntity.ok(CommentMapper.toDetailsDTO(updatedComment));
+        return ResponseEntity.ok(CommentMapper.toDetailsDto(updatedComment));
     }
 
     @DeleteMapping("/{id}") // DELETE /comments/{id}

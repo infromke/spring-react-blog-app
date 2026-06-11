@@ -2,10 +2,10 @@ package br.com.infromke.blog.user;
 
 import br.com.infromke.blog.shared.ratelimit.RateLimit;
 import br.com.infromke.blog.shared.ratelimit.RateLimitType;
-import br.com.infromke.blog.user.dto.UserCreateDTO;
-import br.com.infromke.blog.user.dto.UserDTO;
-import br.com.infromke.blog.user.dto.UserRoleUpdateDTO;
-import br.com.infromke.blog.user.dto.UserUpdateDTO;
+import br.com.infromke.blog.user.dto.UserCreateDto;
+import br.com.infromke.blog.user.dto.UserDto;
+import br.com.infromke.blog.user.dto.UserRoleUpdateDto;
+import br.com.infromke.blog.user.dto.UserUpdateDto;
 import br.com.infromke.blog.user.internal.User;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,8 +41,8 @@ public class UserController {
             direction = Sort.Direction.DESC) Pageable pageable) {
         Page<User> usersPage = userService.findAllUsers(pageable);
 
-        Page<UserDTO> dtoPage = usersPage.map(user ->
-                new UserDTO(
+        Page<UserDto> dtoPage = usersPage.map(user ->
+                new UserDto(
                         user.getId(),
                         user.getName(),
                         user.getEmail(),
@@ -61,7 +61,7 @@ public class UserController {
         User user = userService.findById(id);
 
         return ResponseEntity.ok(
-                new UserDTO(
+                new UserDto(
                         user.getId(),
                         user.getName(),
                         user.getEmail(),
@@ -79,7 +79,7 @@ public class UserController {
         User user = userService.findBySlug(userSlug);
 
         return ResponseEntity.ok(
-                new UserDTO(
+                new UserDto(
                         user.getId(),
                         user.getName(),
                         user.getEmail(),
@@ -94,13 +94,13 @@ public class UserController {
     @RateLimit(type = RateLimitType.SIGNUP)
     @Operation(summary = "Cria um novo usuário", description = "Cria um novo usuário no banco de " +
             "dados com role padrão \"USER\" e avatar gerado a partir de suas iniciais")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDTO user) {
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDto user) {
         User savedUser = userService.createUser(user);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(
-                        new UserDTO(
+                        new UserDto(
                                 savedUser.getId(),
                                 savedUser.getName(),
                                 savedUser.getEmail(),
@@ -115,12 +115,12 @@ public class UserController {
     @Operation(summary = "Atualiza o usuário informado por ID", description = "Atualiza os dados " +
             "básicos do usuário associado ao ID providenciado")
     public ResponseEntity<Object> updateUser(@PathVariable UUID id, HttpServletRequest request,
-                                             @Valid @RequestBody UserUpdateDTO updateData) {
+                                             @Valid @RequestBody UserUpdateDto updateData) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         User updatedUser = userService.updateUser(id, UUID.fromString(userId), updateData);
 
         return ResponseEntity.ok((Object)
-                new UserDTO(
+                new UserDto(
                         updatedUser.getId(),
                         updatedUser.getName(),
                         updatedUser.getEmail(),
@@ -156,7 +156,7 @@ public class UserController {
             "Promove um usuário de qualquer tipo para USER, AUTHOR ou ADMIN. Apenas " +
                     "administradores podem realizar essa operação")
     public ResponseEntity<Object> updateRole(@PathVariable UUID id,
-                                             @Valid @RequestBody UserRoleUpdateDTO dto) {
+                                             @Valid @RequestBody UserRoleUpdateDto dto) {
         userService.updateUserRole(id, dto.role());
         return ResponseEntity.noContent().build();
     }

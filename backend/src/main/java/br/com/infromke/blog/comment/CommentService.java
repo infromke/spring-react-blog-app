@@ -1,7 +1,7 @@
 package br.com.infromke.blog.comment;
 
-import br.com.infromke.blog.comment.dto.CommentCreateDTO;
-import br.com.infromke.blog.comment.dto.CommentUpdateDTO;
+import br.com.infromke.blog.comment.dto.CommentCreateDto;
+import br.com.infromke.blog.comment.dto.CommentUpdateDto;
 import br.com.infromke.blog.comment.internal.Comment;
 import br.com.infromke.blog.comment.internal.CommentRepository;
 import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
@@ -43,7 +43,7 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment createComment(UUID postId, CommentCreateDTO data, UUID authenticatedUserId) {
+    public Comment createComment(UUID postId, CommentCreateDto data, UUID authenticatedUserId) {
         Post post = postService.findById(postId);
         User author = userService.findById(authenticatedUserId);
 
@@ -56,7 +56,7 @@ public class CommentService {
     }
 
     @Transactional
-    public Comment updateComment(UUID commentId, CommentUpdateDTO data, UUID authenticatedUserId) {
+    public Comment updateComment(UUID commentId, CommentUpdateDto data, UUID authenticatedUserId) {
         Comment comment =
                 commentRepository.findById(commentId).orElseThrow(() -> new ResourceNotFoundException(
                         "Comment not found"));

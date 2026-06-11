@@ -4,7 +4,7 @@ import br.com.infromke.blog.user.internal.UserRole;
 
 import java.util.UUID;
 
-public record UserDTO(UUID id,
+public record UserDto(UUID id,
                       String name,
                       String email,
                       String avatar,

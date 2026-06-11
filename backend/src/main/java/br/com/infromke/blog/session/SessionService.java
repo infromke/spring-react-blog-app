@@ -2,7 +2,7 @@ package br.com.infromke.blog.session;
 
 import br.com.infromke.blog.shared.exceptions.BadRequestException;
 import br.com.infromke.blog.shared.services.TokenService;
-import br.com.infromke.blog.session.dto.LoginRequestDTO;
+import br.com.infromke.blog.session.dto.LoginRequestDto;
 import br.com.infromke.blog.session.dto.LoginResponse;
 import br.com.infromke.blog.user.UserService;
 import br.com.infromke.blog.user.internal.User;
@@ -23,7 +23,7 @@ public class SessionService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public LoginResponse authenticate(LoginRequestDTO data) {
+    public LoginResponse authenticate(LoginRequestDto data) {
         User user = userService.findByEmailForAuth(data.email());
 
         if (!passwordEncoder.matches(data.password(), user.getPassword())) {

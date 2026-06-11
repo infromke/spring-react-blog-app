@@ -1,7 +1,7 @@
 package br.com.infromke.blog.post.internal;
 
-import br.com.infromke.blog.post.dto.PostDetailsDTO;
-import br.com.infromke.blog.user.dto.UserSummaryDTO;
+import br.com.infromke.blog.post.dto.PostDetailsDto;
+import br.com.infromke.blog.user.dto.UserSummaryDto;
 
 public final class PostMapper {
 
@@ -9,18 +9,18 @@ public final class PostMapper {
         throw new UnsupportedOperationException("PostMapper is an utility class and cannot be instantiated");
     }
 
-    public static PostDetailsDTO toDetailsDTO(Post post) {
+    public static PostDetailsDto toDetailsDto(Post post) {
         if (post == null) return null;
 
         var author = post.getAuthor();
 
-        UserSummaryDTO authorDTO = new UserSummaryDTO(
+        UserSummaryDto authorDTO = new UserSummaryDto(
                 author.getId(),
                 author.getName(),
                 author.getSlug()
         );
 
-        return new PostDetailsDTO(
+        return new PostDetailsDto(
                 post.getId(),
                 post.getTitle(),
                 post.getSummary(),

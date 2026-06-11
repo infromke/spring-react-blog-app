@@ -2,9 +2,9 @@ package br.com.infromke.blog.session;
 
 import br.com.infromke.blog.shared.ratelimit.RateLimit;
 import br.com.infromke.blog.shared.ratelimit.RateLimitType;
-import br.com.infromke.blog.session.dto.LoginRequestDTO;
+import br.com.infromke.blog.session.dto.LoginRequestDto;
 import br.com.infromke.blog.session.dto.LoginResponse;
-import br.com.infromke.blog.user.dto.UserDTO;
+import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.UserService;
 import br.com.infromke.blog.user.internal.User;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +41,7 @@ public class SessionController {
         User user = userService.findById(UUID.fromString(userId));
 
         // retorna dados do usuário logado
-        return ResponseEntity.ok(new UserDTO(
+        return ResponseEntity.ok(new UserDto(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
@@ -56,7 +56,7 @@ public class SessionController {
     @SecurityRequirements(value = {})
     @Operation(summary = "Realiza o login de um usuário", description = "Cria uma nova sessão e " +
             "atribui um token de acesso (JWT) a um cookie httpOnly")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequestDTO data,
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequestDto data,
                                         HttpServletResponse response) {
         LoginResponse loginData = sessionService.authenticate(data);
 
@@ -70,7 +70,7 @@ public class SessionController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new UserDTO(
+                .body(new UserDto(
                         loginData.user().getId(),
                         loginData.user().getName(),
                         loginData.user().getEmail(),
