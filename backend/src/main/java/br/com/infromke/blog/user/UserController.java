@@ -6,7 +6,6 @@ import br.com.infromke.blog.user.dto.UserCreateDto;
 import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.dto.UserRoleUpdateDto;
 import br.com.infromke.blog.user.dto.UserUpdateDto;
-import br.com.infromke.blog.user.internal.User;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -34,105 +33,59 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping // GET /users
+    // GET /users
+    @GetMapping
     @Operation(summary = "Lista todos os usuários registrados", description = "Retorna os dados " +
             "básicos de todos os usuários registrados")
     public ResponseEntity<Object> getAllUsers(@PageableDefault(size = 10, sort = "createdAt",
             direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<User> usersPage = userService.findAllUsers(pageable);
-
-        Page<UserDto> dtoPage = usersPage.map(user ->
-                new UserDto(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getAvatar(),
-                        user.getSlug(),
-                        user.getRole()
-                )
-        );
-        return ResponseEntity.ok(dtoPage);
+        Page<UserDto> users = userService.findAllUsers(pageable);
+        return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/{id}") // GET /users/id
+    // GET /users/id
+    @GetMapping("/{id}")
     @Operation(summary = "Lista o usuário solicitado por ID", description = "Retorna os dados " +
             "básicos do usuário associado ao ID providenciado")
     public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
-        User user = userService.findById(id);
-
-        return ResponseEntity.ok(
-                new UserDto(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getAvatar(),
-                        user.getSlug(),
-                        user.getRole()
-                )
-        );
+        UserDto user = userService.getSummaryById(id);
+        return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/profile/{userSlug}") // GET /users/profile/userSlug
+    // GET /users/profile/userSlug
+    @GetMapping("/profile/{userSlug}")
     @Operation(summary = "Lista o usuário solicitado por slug", description = "Retorna os dados " +
             "básicos do usuário associado ao slug providenciado")
     public ResponseEntity<Object> getUserBySlug(@PathVariable String userSlug) {
-        User user = userService.findBySlug(userSlug);
-
-        return ResponseEntity.ok(
-                new UserDto(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getAvatar(),
-                        user.getSlug(),
-                        user.getRole()
-                )
-        );
+        UserDto user = userService.findBySlug(userSlug);
+        return ResponseEntity.ok(user);
     }
 
-    @PostMapping // POST /users
+    // POST /users
+    @PostMapping
     @RateLimit(type = RateLimitType.SIGNUP)
     @Operation(summary = "Cria um novo usuário", description = "Cria um novo usuário no banco de " +
             "dados com role padrão \"USER\" e avatar gerado a partir de suas iniciais")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDto user) {
-        User savedUser = userService.createUser(user);
-
+    public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDto dto) {
+        UserDto newUser = userService.createUser(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(
-                        new UserDto(
-                                savedUser.getId(),
-                                savedUser.getName(),
-                                savedUser.getEmail(),
-                                savedUser.getAvatar(),
-                                savedUser.getSlug(),
-                                savedUser.getRole()
-                        )
-                );
+                .body(newUser);
     }
 
-    @PatchMapping("/{id}") // PATCH /users/id
+    // PATCH /users/id
+    @PatchMapping("/{id}")
     @Operation(summary = "Atualiza o usuário informado por ID", description = "Atualiza os dados " +
             "básicos do usuário associado ao ID providenciado")
     public ResponseEntity<Object> updateUser(@PathVariable UUID id, HttpServletRequest request,
-                                             @Valid @RequestBody UserUpdateDto updateData) {
+                                             @Valid @RequestBody UserUpdateDto dto) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
-        User updatedUser = userService.updateUser(id, UUID.fromString(userId), updateData);
-
-        return ResponseEntity.ok((Object)
-                new UserDto(
-                        updatedUser.getId(),
-                        updatedUser.getName(),
-                        updatedUser.getEmail(),
-                        updatedUser.getAvatar(),
-                        updatedUser.getSlug(),
-                        updatedUser.getRole()
-                )
-        );
+        UserDto updatedUser = userService.updateUser(id, UUID.fromString(userId), dto);
+        return ResponseEntity.ok(updatedUser);
     }
 
-    @PatchMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // PATCH /users/id/avatar
+    @PatchMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualiza o avatar do usuário informado por ID", description = "Atualiza" +
             " o avatar do usuário associado ao ID providenciado, excluindo o arquivo binário " +
             "antigo caso o mesmo exista")
@@ -150,7 +103,8 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/role") // PATCH /users/id/role
+    // PATCH /users/id/role
+    @PatchMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza o campo \"role\" do usuário informado por ID", description =
             "Promove um usuário de qualquer tipo para USER, AUTHOR ou ADMIN. Apenas " +
@@ -161,7 +115,8 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{id}") // DELETE /users/id
+    // DELETE /users/id
+    @DeleteMapping("/{id}")
     @Operation(summary = "Exclui os dados do usuário informado por ID", description = "Deleta o " +
             "usuário associado ao ID providenciado, incluindo dados, avatar, publicações, " +
             "comentários e curtidas")

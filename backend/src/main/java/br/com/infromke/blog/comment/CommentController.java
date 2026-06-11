@@ -3,8 +3,6 @@ package br.com.infromke.blog.comment;
 import br.com.infromke.blog.comment.dto.CommentCreateDto;
 import br.com.infromke.blog.comment.dto.CommentDetailsDto;
 import br.com.infromke.blog.comment.dto.CommentUpdateDto;
-import br.com.infromke.blog.comment.internal.Comment;
-import br.com.infromke.blog.comment.internal.CommentMapper;
 import br.com.infromke.blog.shared.ratelimit.RateLimit;
 import br.com.infromke.blog.shared.ratelimit.RateLimitType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,57 +28,50 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @GetMapping("/post/{postId}") // GET /comments/post/{postId}
+    // GET /comments/post/{postId}
+    @GetMapping("/post/{postId}")
     @Operation(summary = "Lista todos os comentários em uma publicação", description = "Retorna " +
             "todos os comentários associados ao ID da publicação informada")
     public ResponseEntity<Object> getAllComments(@PathVariable UUID postId,
                                                  @PageableDefault(size = 10, sort = "createdAt",
                                                          direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<Comment> commentsPage = commentService.findAllByPostId(postId, pageable);
-
-        Page<CommentDetailsDto> dtoPage =
-                commentsPage.map(comment -> CommentMapper.toDetailsDto(comment));
-
-        return ResponseEntity.ok(dtoPage);
+        Page<CommentDetailsDto> comments = commentService.findAllByPostId(postId, pageable);
+        return ResponseEntity.ok(comments);
     }
 
-    @PostMapping("/post/{postId}") // POST /comments/post/{postId}
+    // POST /comments/post/{postId}
+    @PostMapping("/post/{postId}")
     @RateLimit(type = RateLimitType.COMMENT_CREATION)
     @Operation(summary = "Cria um novo comentário", description = "Vincula um comentário a um " +
             "post existente usando o ID do usuário autenticado e o ID da publicação")
     public ResponseEntity<Object> createComment(@PathVariable UUID postId,
                                                 HttpServletRequest request,
-                                                @Valid @RequestBody CommentCreateDto data) {
+                                                @Valid @RequestBody CommentCreateDto dto) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
-
-        Comment savedComment = commentService.createComment(postId, data, UUID.fromString(userId));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommentMapper.toDetailsDto(savedComment));
+        CommentDetailsDto savedComment = commentService.createComment(postId, dto, UUID.fromString(userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedComment);
     }
 
-    @PatchMapping("/{id}") // PATCH /comments/{id}
+    // PATCH /comments/{id}
+    @PatchMapping("/{id}")
     @Operation(summary = "Atualiza o comentário informado por ID", description = "Atualiza o " +
             "conteúdo do comentário associado ao ID providenciado")
     public ResponseEntity<Object> updateComment(@PathVariable("id") UUID commentId,
                                                 HttpServletRequest request,
-                                                @Valid @RequestBody CommentUpdateDto updateData) {
+                                                @Valid @RequestBody CommentUpdateDto dto) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
-
-        Comment updatedComment = commentService.updateComment(commentId, updateData,
-                UUID.fromString(userId));
-
-        return ResponseEntity.ok(CommentMapper.toDetailsDto(updatedComment));
+        CommentDetailsDto updatedComment = commentService.updateComment(commentId, dto, UUID.fromString(userId));
+        return ResponseEntity.ok(updatedComment);
     }
 
-    @DeleteMapping("/{id}") // DELETE /comments/{id}
+    // DELETE /comments/{id}
+    @DeleteMapping("/{id}")
     @Operation(summary = "Exclui o comentário informado por ID", description = "Deleta o " +
             "comentário associado ao ID providenciado")
     public ResponseEntity<Object> deleteComment(@PathVariable("id") UUID commentId,
                                                 HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
-
         commentService.deleteComment(commentId, UUID.fromString(userId));
-
         return ResponseEntity.noContent().build();
     }
 }

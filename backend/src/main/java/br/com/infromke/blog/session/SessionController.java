@@ -6,7 +6,6 @@ import br.com.infromke.blog.session.dto.LoginRequestDto;
 import br.com.infromke.blog.session.dto.LoginResponse;
 import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.UserService;
-import br.com.infromke.blog.user.internal.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,34 +30,25 @@ public class SessionController {
         this.userService = userService;
     }
 
-    @GetMapping("/me") // GET /sessions/me
+    // GET /sessions/me
+    @GetMapping("/me")
     @Operation(summary = "Lista o usuário autenticado", description = "Retorna os dados básicos " +
             "do usuário atualmente autenticado")
     public ResponseEntity<Object> me(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recupera o ID do usuário
-
-        // busca pelo usuário
-        User user = userService.findById(UUID.fromString(userId));
-
-        // retorna dados do usuário logado
-        return ResponseEntity.ok(new UserDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getAvatar(),
-                user.getSlug(),
-                user.getRole()
-        ));
+        UserDto user = userService.getSummaryById(UUID.fromString(userId));
+        return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/login") // POST /sessions/login
+    // POST /sessions/login
+    @PostMapping("/login")
     @RateLimit(type = RateLimitType.LOGIN)
     @SecurityRequirements(value = {})
     @Operation(summary = "Realiza o login de um usuário", description = "Cria uma nova sessão e " +
             "atribui um token de acesso (JWT) a um cookie httpOnly")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequestDto data,
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequestDto dto,
                                         HttpServletResponse response) {
-        LoginResponse loginData = sessionService.authenticate(data);
+        LoginResponse loginData = sessionService.authenticate(dto);
 
         ResponseCookie cookie = ResponseCookie.from("accessToken", loginData.token())
                 .httpOnly(true)
@@ -70,17 +60,11 @@ public class SessionController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new UserDto(
-                        loginData.user().getId(),
-                        loginData.user().getName(),
-                        loginData.user().getEmail(),
-                        loginData.user().getAvatar(),
-                        loginData.user().getSlug(),
-                        loginData.user().getRole())
-                );
+                .body(loginData.user());
     }
 
-    @PostMapping("/logout") // POST /sessions/logout
+    // POST /sessions/logout
+    @PostMapping("/logout")
     @Operation(summary = "Realiza o logout", description = "Destrói a sessão e " +
             "remove o cookie httpOnly do navegador")
     public ResponseEntity<Object> logout(HttpServletResponse response) {
