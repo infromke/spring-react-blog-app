@@ -1,4 +1,4 @@
-package br.com.infromke.blog.shared.services;
+package br.com.infromke.blog.shared.helpers;
 
 import com.sksamuel.scrimage.ImmutableImage;
 import com.sksamuel.scrimage.webp.WebpWriter;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class MultiPartService {
+public class ImageStorageHelper {
 
     @Value("${api.file.upload.path}")
     private String uploadPath;

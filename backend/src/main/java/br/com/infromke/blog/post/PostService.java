@@ -2,7 +2,7 @@ package br.com.infromke.blog.post;
 
 import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
-import br.com.infromke.blog.shared.services.MultiPartService;
+import br.com.infromke.blog.shared.helpers.ImageStorageHelper;
 import br.com.infromke.blog.post.dto.PostCreateDTO;
 import br.com.infromke.blog.post.dto.PostUpdateDTO;
 import br.com.infromke.blog.post.internal.Post;
@@ -24,13 +24,13 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserService userService;
-    private final MultiPartService multiPartService;
+    private final ImageStorageHelper imageStorageHelper;
 
     public PostService(PostRepository postRepository, UserService userService,
-                       MultiPartService multiPartService) {
+                       ImageStorageHelper imageStorageHelper) {
         this.postRepository = postRepository;
         this.userService = userService;
-        this.multiPartService = multiPartService;
+        this.imageStorageHelper = imageStorageHelper;
     }
 
     @Transactional(readOnly = true)
@@ -128,11 +128,11 @@ public class PostService {
 
         // deleta a imagem antiga se ela existir e não for um link (pra salvar espaço)
         if (post.getBanner() != null && !post.getBanner().startsWith("http")) {
-            multiPartService.deleteImage("banners", post.getBanner());
+            imageStorageHelper.deleteImage("banners", post.getBanner());
         }
 
         // processa, redimensiona e converte a imagem para .webp
-        String newFileName = multiPartService.processImage(
+        String newFileName = imageStorageHelper.processImage(
                 fileBytes,
                 contentType,
                 "banners",
@@ -158,7 +158,7 @@ public class PostService {
 
         // deleta a imagem antiga se ela existir e não for um link (pra salvar espaço)
         if (post.getBanner() != null && !post.getBanner().startsWith("http")) {
-            multiPartService.deleteImage("banners", post.getBanner());
+            imageStorageHelper.deleteImage("banners", post.getBanner());
         }
 
         postRepository.deleteById(id);

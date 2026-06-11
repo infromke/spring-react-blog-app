@@ -1,5 +1,6 @@
-package br.com.infromke.blog.shared.exceptions;
+package br.com.infromke.blog.shared.handlers;
 
+import br.com.infromke.blog.shared.exceptions.*;
 import br.com.infromke.blog.shared.exceptions.dto.ErrorResponse;
 import br.com.infromke.blog.shared.exceptions.dto.ValidationErrorResponse;
 import br.com.infromke.blog.shared.utils.ExceptionStackGenerator;

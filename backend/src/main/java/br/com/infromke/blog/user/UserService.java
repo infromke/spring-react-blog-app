@@ -4,7 +4,7 @@ import br.com.infromke.blog.shared.exceptions.BadRequestException;
 import br.com.infromke.blog.shared.exceptions.ForbiddenActionException;
 import br.com.infromke.blog.shared.exceptions.ResourceAlreadyExistsException;
 import br.com.infromke.blog.shared.exceptions.ResourceNotFoundException;
-import br.com.infromke.blog.shared.services.MultiPartService;
+import br.com.infromke.blog.shared.helpers.ImageStorageHelper;
 import br.com.infromke.blog.user.dto.UserCreateDTO;
 import br.com.infromke.blog.user.dto.UserUpdateDTO;
 import br.com.infromke.blog.user.internal.User;
@@ -26,13 +26,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final MultiPartService multiPartService;
+    private final ImageStorageHelper imageStorageHelper;
 
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
-                       MultiPartService multiPartService) {
+                       ImageStorageHelper imageStorageHelper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.multiPartService = multiPartService;
+        this.imageStorageHelper = imageStorageHelper;
     }
 
     @Transactional(readOnly = true)
@@ -133,11 +133,11 @@ public class UserService {
 
         // deleta a imagem antiga se ela existir e não for um link (pra salvar espaço)
         if (user.getAvatar() != null && !user.getAvatar().startsWith("http")) {
-            multiPartService.deleteImage("avatars", user.getAvatar());
+            imageStorageHelper.deleteImage("avatars", user.getAvatar());
         }
 
         // processa, redimensiona e converte a imagem para .webp
-        String newFileName = multiPartService.processImage(
+        String newFileName = imageStorageHelper.processImage(
                 fileBytes,
                 contentType,
                 "avatars",
@@ -171,14 +171,14 @@ public class UserService {
 
         // deleta o avatar do usuário se uma imagem física existir
         if (user.getAvatar() != null && !user.getAvatar().startsWith("http")) {
-            multiPartService.deleteImage("avatars", user.getAvatar());
+            imageStorageHelper.deleteImage("avatars", user.getAvatar());
         }
 
         // deleta os banners físicos de todos os posts do usuário caso existam
         if (user.getPosts() != null) {
             user.getPosts().forEach(post -> {
                 if (post.getBanner() != null && !post.getBanner().startsWith("http")) {
-                    multiPartService.deleteImage("banners", post.getBanner());
+                    imageStorageHelper.deleteImage("banners", post.getBanner());
                 }
             });
         }
