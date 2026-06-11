@@ -24,7 +24,8 @@ public class PostLikeController {
         this.postLikeService = postLikeService;
     }
 
-    @PostMapping("/post/{postId}") // POST /likes/post/{postId}
+    // POST /likes/post/{postId}
+    @PostMapping("/post/{postId}")
     @RateLimit(type = RateLimitType.LIKE_TOGGLE)
     @Operation(summary = "Alterna curtida em uma publicação", description = "Adiciona ou remove a" +
             " curtida do usuário autenticado em um post.")
