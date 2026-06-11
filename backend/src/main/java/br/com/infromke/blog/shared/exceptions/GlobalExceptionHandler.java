@@ -1,5 +1,7 @@
 package br.com.infromke.blog.shared.exceptions;
 
+import br.com.infromke.blog.shared.exceptions.dto.ErrorResponse;
+import br.com.infromke.blog.shared.exceptions.dto.ValidationErrorResponse;
 import br.com.infromke.blog.shared.utils.ExceptionStackGenerator;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
