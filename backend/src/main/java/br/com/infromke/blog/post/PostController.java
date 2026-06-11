@@ -1,5 +1,6 @@
 package br.com.infromke.blog.post;
 
+import br.com.infromke.blog.shared.exceptions.BadRequestException;
 import br.com.infromke.blog.shared.ratelimit.RateLimit;
 import br.com.infromke.blog.shared.ratelimit.RateLimitType;
 import br.com.infromke.blog.post.dto.PostCreateDto;
@@ -123,6 +124,10 @@ public class PostController {
     public ResponseEntity<Object> updateBanner(@PathVariable("id") UUID postId,
                                                HttpServletRequest request,
                                                @RequestParam("banner") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("Banner file is required and cannot be empty");
+        }
+
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
         // extrai os bytes e o tipo do arquivo

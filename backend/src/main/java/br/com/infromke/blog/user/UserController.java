@@ -1,5 +1,6 @@
 package br.com.infromke.blog.user;
 
+import br.com.infromke.blog.shared.exceptions.BadRequestException;
 import br.com.infromke.blog.shared.ratelimit.RateLimit;
 import br.com.infromke.blog.shared.ratelimit.RateLimitType;
 import br.com.infromke.blog.user.dto.UserCreateDto;
@@ -92,6 +93,10 @@ public class UserController {
     public ResponseEntity<Object> updateAvatar(@PathVariable UUID id,
                                                HttpServletRequest request,
                                                @RequestParam("avatar") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new BadRequestException("Avatar file is required and cannot be empty");
+        }
+
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
         // extrai os bytes e o tipo do arquivo
