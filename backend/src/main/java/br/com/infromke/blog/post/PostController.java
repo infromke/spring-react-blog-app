@@ -37,7 +37,7 @@ public class PostController {
     @GetMapping
     @Operation(summary = "Lista todas as publicações criadas", description = "Retorna os dados " +
             "básicos de todas as publicações existentes")
-    public ResponseEntity<Object> getAllPosts(@PageableDefault(size = 10, sort = "createdAt",
+    public ResponseEntity<Object> getAll(@PageableDefault(size = 10, sort = "createdAt",
             direction = Sort.Direction.DESC) Pageable pageable) {
         Page<PostDetailsDto> posts = postService.findAllPosts(pageable);
         return ResponseEntity.ok(posts);
@@ -47,7 +47,7 @@ public class PostController {
     @GetMapping("/{id}")
     @Operation(summary = "Lista a publicação solicitada por ID", description = "Retorna os dados " +
             "básicos da publicação associada ao ID providenciado")
-    public ResponseEntity<Object> getPostById(@PathVariable UUID id) {
+    public ResponseEntity<Object> getById(@PathVariable UUID id) {
         PostDetailsDto post = postService.getDetailsById(id);
         return ResponseEntity.ok(post);
     }
@@ -56,7 +56,7 @@ public class PostController {
     @GetMapping("/slug/{postSlug}")
     @Operation(summary = "Lista a publicação solicitada por slug", description = "Retorna os " +
             "dados básicos da publicação associada ao slug providenciado")
-    public ResponseEntity<Object> getPostBySlug(@PathVariable String postSlug) {
+    public ResponseEntity<Object> getBySlug(@PathVariable String postSlug) {
         PostDetailsDto post = postService.findBySlug(postSlug);
         return ResponseEntity.ok(post);
     }
@@ -65,7 +65,7 @@ public class PostController {
     @GetMapping("/author/{authorSlug}")
     @Operation(summary = "Lista as publicações solicitadas por slug de autor", description =
             "Retorna todas as publicações associada ao slug de autor providenciado")
-    public ResponseEntity<Object> getAllPostsByAuthor(@PathVariable String authorSlug,
+    public ResponseEntity<Object> getAllByAuthor(@PathVariable String authorSlug,
                                                       @PageableDefault(size = 10, sort =
                                                               "createdAt", direction =
                                                               Sort.Direction.DESC) Pageable pageable) {
@@ -78,7 +78,7 @@ public class PostController {
     @Operation(summary = "Lista as publicações cujo título correspondem ao termo informado",
             description = "Retorna os dados básicos de todas as publicações cujo título " +
                     "correspondem ao termo providenciado")
-    public ResponseEntity<Object> getAllPostsByTitle(@RequestParam String title,
+    public ResponseEntity<Object> getAllByTitle(@RequestParam String title,
                                                      @PageableDefault(size = 10, sort =
                                                              "createdAt", direction =
                                                              Sort.Direction.DESC) Pageable pageable) {
@@ -93,7 +93,7 @@ public class PostController {
     @Operation(summary = "Cria uma nova publicação", description = "Vincula uma publicação a um " +
             "autor existente usando o ID do usuário autenticado. Apenas autores e administradores" +
             " podem realizar essa operação")
-    public ResponseEntity<Object> createPost(@Valid @RequestBody PostCreateDto dto,
+    public ResponseEntity<Object> create(@Valid @RequestBody PostCreateDto dto,
                                              HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         PostDetailsDto savedPost = postService.createPost(dto, UUID.fromString(userId));
@@ -106,7 +106,7 @@ public class PostController {
     @PatchMapping("/{id}")
     @Operation(summary = "Atualiza a publicação informada por ID", description = "Atualiza os " +
             "dados básicos da publicação associada ao ID providenciado")
-    public ResponseEntity<Object> updatePost(@PathVariable("id") UUID postId,
+    public ResponseEntity<Object> update(@PathVariable("id") UUID postId,
                                              HttpServletRequest request,
                                              @RequestBody PostUpdateDto dto) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
@@ -143,7 +143,7 @@ public class PostController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Exclui os dados da publicação informada por ID", description = "Deleta " +
             "a publicação associada ao ID providenciado, incluindo banner, comentários e curtidas")
-    public ResponseEntity<Object> deletePost(@PathVariable("id") UUID postId,
+    public ResponseEntity<Object> delete(@PathVariable("id") UUID postId,
                                              HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         postService.deletePost(postId, UUID.fromString(userId));

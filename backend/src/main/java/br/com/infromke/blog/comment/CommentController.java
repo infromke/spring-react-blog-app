@@ -32,7 +32,7 @@ public class CommentController {
     @GetMapping("/post/{postId}")
     @Operation(summary = "Lista todos os comentários em uma publicação", description = "Retorna " +
             "todos os comentários associados ao ID da publicação informada")
-    public ResponseEntity<Object> getAllComments(@PathVariable UUID postId,
+    public ResponseEntity<Object> getAll(@PathVariable UUID postId,
                                                  @PageableDefault(size = 10, sort = "createdAt",
                                                          direction = Sort.Direction.DESC) Pageable pageable) {
         Page<CommentDetailsDto> comments = commentService.findAllByPostId(postId, pageable);
@@ -44,7 +44,7 @@ public class CommentController {
     @RateLimit(type = RateLimitType.COMMENT_CREATION)
     @Operation(summary = "Cria um novo comentário", description = "Vincula um comentário a um " +
             "post existente usando o ID do usuário autenticado e o ID da publicação")
-    public ResponseEntity<Object> createComment(@PathVariable UUID postId,
+    public ResponseEntity<Object> create(@PathVariable UUID postId,
                                                 HttpServletRequest request,
                                                 @Valid @RequestBody CommentCreateDto dto) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
@@ -56,7 +56,7 @@ public class CommentController {
     @PatchMapping("/{id}")
     @Operation(summary = "Atualiza o comentário informado por ID", description = "Atualiza o " +
             "conteúdo do comentário associado ao ID providenciado")
-    public ResponseEntity<Object> updateComment(@PathVariable("id") UUID commentId,
+    public ResponseEntity<Object> update(@PathVariable("id") UUID commentId,
                                                 HttpServletRequest request,
                                                 @Valid @RequestBody CommentUpdateDto dto) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
@@ -68,7 +68,7 @@ public class CommentController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Exclui o comentário informado por ID", description = "Deleta o " +
             "comentário associado ao ID providenciado")
-    public ResponseEntity<Object> deleteComment(@PathVariable("id") UUID commentId,
+    public ResponseEntity<Object> delete(@PathVariable("id") UUID commentId,
                                                 HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         commentService.deleteComment(commentId, UUID.fromString(userId));

@@ -31,7 +31,7 @@ public class SessionController {
     @GetMapping("/me")
     @Operation(summary = "Lista o usuário autenticado", description = "Retorna os dados básicos " +
             "do usuário atualmente autenticado")
-    public ResponseEntity<Object> me(HttpServletRequest request) {
+    public ResponseEntity<Object> status(HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recupera o ID do usuário
         UserDto user = sessionService.showStatus(UUID.fromString(userId));
         return ResponseEntity.ok(user);

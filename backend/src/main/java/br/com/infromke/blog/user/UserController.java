@@ -38,26 +38,26 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Lista todos os usuários registrados", description = "Retorna os dados " +
             "básicos de todos os usuários registrados")
-    public ResponseEntity<Object> getAllUsers(@PageableDefault(size = 10, sort = "createdAt",
+    public ResponseEntity<Object> getAll(@PageableDefault(size = 10, sort = "createdAt",
             direction = Sort.Direction.DESC) Pageable pageable) {
         Page<UserDto> users = userService.findAllUsers(pageable);
         return ResponseEntity.ok(users);
     }
 
-    // GET /users/id
+    // GET /users/{id}
     @GetMapping("/{id}")
     @Operation(summary = "Lista o usuário solicitado por ID", description = "Retorna os dados " +
             "básicos do usuário associado ao ID providenciado")
-    public ResponseEntity<Object> getUserById(@PathVariable UUID id) {
+    public ResponseEntity<Object> getById(@PathVariable UUID id) {
         UserDto user = userService.getSummaryById(id);
         return ResponseEntity.ok(user);
     }
 
-    // GET /users/profile/userSlug
+    // GET /users/profile/{userSlug}
     @GetMapping("/profile/{userSlug}")
     @Operation(summary = "Lista o usuário solicitado por slug", description = "Retorna os dados " +
             "básicos do usuário associado ao slug providenciado")
-    public ResponseEntity<Object> getUserBySlug(@PathVariable String userSlug) {
+    public ResponseEntity<Object> getBySlug(@PathVariable String userSlug) {
         UserDto user = userService.findBySlug(userSlug);
         return ResponseEntity.ok(user);
     }
@@ -67,25 +67,25 @@ public class UserController {
     @RateLimit(type = RateLimitType.SIGNUP)
     @Operation(summary = "Cria um novo usuário", description = "Cria um novo usuário no banco de " +
             "dados com role padrão \"USER\" e avatar gerado a partir de suas iniciais")
-    public ResponseEntity<Object> createUser(@Valid @RequestBody UserCreateDto dto) {
+    public ResponseEntity<Object> create(@Valid @RequestBody UserCreateDto dto) {
         UserDto newUser = userService.createUser(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(newUser);
     }
 
-    // PATCH /users/id
+    // PATCH /users/{id}
     @PatchMapping("/{id}")
     @Operation(summary = "Atualiza o usuário informado por ID", description = "Atualiza os dados " +
             "básicos do usuário associado ao ID providenciado")
-    public ResponseEntity<Object> updateUser(@PathVariable UUID id, HttpServletRequest request,
+    public ResponseEntity<Object> update(@PathVariable UUID id, HttpServletRequest request,
                                              @Valid @RequestBody UserUpdateDto dto) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         UserDto updatedUser = userService.updateUser(id, UUID.fromString(userId), dto);
         return ResponseEntity.ok(updatedUser);
     }
 
-    // PATCH /users/id/avatar
+    // PATCH /users/{id}/avatar
     @PatchMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Atualiza o avatar do usuário informado por ID", description = "Atualiza" +
             " o avatar do usuário associado ao ID providenciado, excluindo o arquivo binário " +
@@ -108,7 +108,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // PATCH /users/id/role
+    // PATCH /users/{id}/role
     @PatchMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Atualiza o campo \"role\" do usuário informado por ID", description =
@@ -120,12 +120,12 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // DELETE /users/id
+    // DELETE /users/{id}
     @DeleteMapping("/{id}")
     @Operation(summary = "Exclui os dados do usuário informado por ID", description = "Deleta o " +
             "usuário associado ao ID providenciado, incluindo dados, avatar, publicações, " +
             "comentários e curtidas")
-    public ResponseEntity<Object> deleteUser(@PathVariable UUID id, HttpServletRequest request) {
+    public ResponseEntity<Object> delete(@PathVariable UUID id, HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
         userService.deleteUser(id, UUID.fromString(userId));
 

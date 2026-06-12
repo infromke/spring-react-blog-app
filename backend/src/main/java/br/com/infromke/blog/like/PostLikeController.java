@@ -29,7 +29,7 @@ public class PostLikeController {
     @RateLimit(type = RateLimitType.LIKE_TOGGLE)
     @Operation(summary = "Alterna curtida em uma publicação", description = "Adiciona ou remove a" +
             " curtida do usuário autenticado em um post.")
-    public ResponseEntity<Void> toggleLike(@PathVariable UUID postId,
+    public ResponseEntity<Void> toggle(@PathVariable UUID postId,
                                              HttpServletRequest request) {
         String userId = (String) request.getAttribute("userId"); // recuperando o id anexado
 
