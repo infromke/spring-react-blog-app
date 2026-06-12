@@ -25,12 +25,14 @@ import java.util.UUID;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostMapper postMapper;
     private final UserService userService;
     private final ImageStorageHelper imageStorageHelper;
 
-    public PostService(PostRepository postRepository, UserService userService,
-                       ImageStorageHelper imageStorageHelper) {
+    public PostService(PostRepository postRepository, PostMapper postMapper,
+                       UserService userService, ImageStorageHelper imageStorageHelper) {
         this.postRepository = postRepository;
+        this.postMapper = postMapper;
         this.userService = userService;
         this.imageStorageHelper = imageStorageHelper;
     }
@@ -38,7 +40,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public Page<PostDetailsDto> findAllPosts(Pageable pageable) {
         Page<Post> posts = postRepository.findAll(pageable);
-        return posts.map(post -> PostMapper.toDetailsDto(post));
+        return posts.map(post -> postMapper.toDetailsDto(post));
     }
 
     @Transactional(readOnly = true)
@@ -50,7 +52,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostDetailsDto getDetailsById(UUID id) {
         Post post = findEntityById(id);
-        return PostMapper.toDetailsDto(post);
+        return postMapper.toDetailsDto(post);
     }
 
     @Transactional(readOnly = true)
@@ -58,20 +60,20 @@ public class PostService {
     public PostDetailsDto findBySlug(String postSlug) {
         Post post = postRepository.findBySlug(postSlug)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
-        return PostMapper.toDetailsDto(post);
+        return postMapper.toDetailsDto(post);
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "authors", key = "#authorSlug")
     public Page<PostDetailsDto> findByAuthor(String authorSlug, Pageable pageable) {
         Page<Post> posts = postRepository.findAllByAuthorSlug(authorSlug, pageable);
-        return posts.map(post -> PostMapper.toDetailsDto(post));
+        return posts.map(post -> postMapper.toDetailsDto(post));
     }
 
     @Transactional(readOnly = true)
     public Page<PostDetailsDto> findByTitle(String title, Pageable pageable) {
         Page<Post> posts = postRepository.findByTitleContainingIgnoreCase(title, pageable);
-        return posts.map(post -> PostMapper.toDetailsDto(post));
+        return posts.map(post -> postMapper.toDetailsDto(post));
     }
 
     @Transactional

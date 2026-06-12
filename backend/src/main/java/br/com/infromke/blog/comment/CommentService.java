@@ -23,11 +23,14 @@ import java.util.UUID;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final CommentMapper commentMapper;
     private final PostService postService;
     private final UserService userService;
 
-    public CommentService(CommentRepository commentRepository, PostService postService, UserService userService) {
+    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper,
+                          PostService postService, UserService userService) {
         this.commentRepository = commentRepository;
+        this.commentMapper = commentMapper;
         this.postService = postService;
         this.userService = userService;
     }
@@ -36,7 +39,7 @@ public class CommentService {
     public Page<CommentDetailsDto> findAllByPostId(UUID postId, Pageable pageable) {
         Post post = postService.findEntityById(postId);
         Page<Comment> comments = commentRepository.findAllByPostId(post.getId(), pageable);
-        return comments.map(comment -> CommentMapper.toDetailsDto(comment));
+        return comments.map(comment -> commentMapper.toDetailsDto(comment));
     }
 
     @Transactional(readOnly = true)
@@ -48,11 +51,12 @@ public class CommentService {
     @Transactional(readOnly = true)
     public CommentDetailsDto getDetailsById(UUID id) {
         Comment comment = findEntityById(id);
-        return CommentMapper.toDetailsDto(comment);
+        return commentMapper.toDetailsDto(comment);
     }
 
     @Transactional
-    public CommentDetailsDto createComment(UUID postId, CommentCreateDto dto, UUID authenticatedUserId) {
+    public CommentDetailsDto createComment(UUID postId, CommentCreateDto dto,
+                                           UUID authenticatedUserId) {
         Post post = postService.findEntityById(postId);
         User author = userService.findEntityById(authenticatedUserId);
 
@@ -66,14 +70,15 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentDetailsDto updateComment(UUID commentId, CommentUpdateDto dto, UUID authenticatedUserId) {
+    public CommentDetailsDto updateComment(UUID commentId, CommentUpdateDto dto,
+                                           UUID authenticatedUserId) {
         Comment comment = findEntityById(commentId);
 
         if (!comment.getAuthor().getId().equals(authenticatedUserId)) {
             throw new ForbiddenActionException("You are not authorized to modify this comment");
         }
 
-        if(dto.content() != null) {
+        if (dto.content() != null) {
             comment.setContent(dto.content());
         }
 

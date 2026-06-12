@@ -10,6 +10,7 @@ import br.com.infromke.blog.user.dto.UserCreateDto;
 import br.com.infromke.blog.user.dto.UserDto;
 import br.com.infromke.blog.user.dto.UserUpdateDto;
 import br.com.infromke.blog.user.internal.User;
+import br.com.infromke.blog.user.internal.UserMapper;
 import br.com.infromke.blog.user.internal.UserRepository;
 import br.com.infromke.blog.user.internal.UserRole;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,34 +28,27 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ImageStorageHelper imageStorageHelper;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder,
+    public UserService(UserRepository userRepository, UserMapper userMapper,
+                       BCryptPasswordEncoder passwordEncoder,
                        ImageStorageHelper imageStorageHelper) {
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.imageStorageHelper = imageStorageHelper;
     }
 
     @Transactional(readOnly = true)
     public Page<UserDto> findAllUsers(Pageable pageable) {
-        Page<User> usersPage = userRepository.findAll(pageable);
-
-        return usersPage.map(user ->
-                new UserDto(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getAvatar(),
-                        user.getSlug(),
-                        user.getRole()
-                )
-        );
+        Page<User> users = userRepository.findAll(pageable);
+        return users.map(user -> userMapper.toDto(user));
     }
 
     @Transactional(readOnly = true)
-    public User findEntityById(UUID id){
+    public User findEntityById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
@@ -62,15 +56,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserDto getSummaryById(UUID id) {
         User user = findEntityById(id);
-
-        return new UserDto(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getAvatar(),
-                user.getSlug(),
-                user.getRole()
-        );
+        return userMapper.toDto(user);
     }
 
     @Transactional(readOnly = true)
