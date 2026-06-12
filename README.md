@@ -19,9 +19,10 @@ A arquitetura do projeto foi estruturada sob os paradigmas da Orientação a Obj
 os padrões de design nativos do ecossistema Spring, com foco em performance:
 
 - **Spring Modulith**: Organização em módulos de domínio estritos (User, Post, Session, Comment,
-  Like), garantindo baixo acoplamento;
-- **Encapsulamento de Módulo**: Uso de pacotes "internal" para detalhes de implementação e pacotes
-  DTO para contratos de interface, expondo apenas o necessário;
+  Like) com isolamento completo via pacotes "internal" e comunicação Service-to-Service (S2S);
+- **CQRS Semântico**: Separação de responsabilidades entre operações de
+  escrita e leitura. Métodos de persistência manipulam entidades brutas e métodos de consulta
+  gerenciam projeções recursivas de DTOs;
 - **Fetch Strategy**: Uso de FetchType.LAZY em todos os relacionamentos entre entidades para
   garantir que a API só traga do banco o que realmente vai usar;
 - **Integridade e Ciclo de Vida**: Uso de exclusão em cascata (CascadeType.ALL) e remoção de
@@ -45,24 +46,29 @@ os padrões de design nativos do ecossistema Spring, com foco em performance:
   `Spring Boot Actuator`, fornecendo métricas de saúde e monitoramento de tráfego;
 - **Documentation**: `SpringDoc OpenAPI` 3.0.0 para geração automática de especificação e interface
   Swagger;
+- **Object Mapping**: `MapStruct 1.6.3` para geração automática de código de mapeamento de objetos (Entity para DTO) em tempo de compilação;
 - **Utils**: `Lombok` para reduzir o boilerplate de modelos e DTOs e `JSpecify` como suporte a
   anotações de nulidade estrita.
 
 ## Funcionalidades
 
 - **Autenticação Stateless**: Login seguro com persistência via cookies httpOnly e secure;
-- **RBAC (Role-Based Access Control)**: Diferenciação de permissões entre usuários comuns e
+- **RBAC (Role-Based Access Control)**: Diferenciação de permissões entre usuários comuns, autores e
   administradores certificado em rotas com o @PreAuthorize;
+- **Task-Based Promotion**: Inclusão de endpoint dedicado e semântico para promoção de cargos de
+  usuários executado estritamente por administradores;
 - **Paginação e Busca**: Implementação nativa com Pageable, suportando as queries size, page e sort
   diretamente na URL, com filtro de busca parcial e case-insensitive integrados ao JPA;
 - **Rate Limiting**: Proteção contra ataques de força bruta e DoS com limites de requisições por
   IP e tipo de operação (cadastro, criação de conteúdo, etc);
-- **Processamento de Mídia**: Redimensionamento e conversão automática de imagens para WebP, com
-  gestão automática de storage (remoção de arquivos órfãos);
+- **Processamento de Mídia**: Conversão de arquivos MultipartFile em arrays de "byte[]".
+  Redimensionamento e conversão automática de imagens para WebP, com gestão automática de storage (remoção de arquivos órfãos);
 - **Slugification**: Geração automática de URLs para posts e perfis com o hook @PrePersist;
 - **Caching por Comportamento**: Sistema de cache inteligente com TTLs variados para posts (10 min
-  para conteúdos e listagens gerais), authors (5 min para listagens de posts por autor) e profiles (
-  30 min para dados quase estáticos de usuários);
+  para conteúdos e listagens gerais), authors (5 min para listagens de posts por autor) e profiles (30 min para dados quase estáticos de usuários);
+- **Rastreamento de Pilha por Ambiente**: Customização do ecossistema RFC 7807 para omitir ou
+  exibir stack traces detalhados de forma dinâmica, utilizando variáveis de ambiente para proteger
+  dados de infraestrutura em produção;
 - **Documentação**: Interface Swagger UI configurada com SecurityScheme (JWT Bearer), permitindo
   testes autenticados diretamente pelo navegador.
 
@@ -76,8 +82,8 @@ Corretto ou Zulu), PostgreSQL e Maven (opcional, pois o projeto inclui o Maven W
 Abra o terminal e execute:
 
 ```shell
-  git clone https://github.com/infrmke/spring-react-blog-system.git
-  cd spring-react-blog-system
+  git clone https://github.com/infromke/spring-react-blog-app.git
+  cd spring-react-blog-app
 ```
 
 2. Configure o Banco de Dados
@@ -86,9 +92,9 @@ Crie um banco de dados no PostgreSQL chamado "blog_db" (ou o que preferir). Em s
 credenciais no arquivo `src/main/resources/application.properties`:
 
 ```properties
-    spring.datasource.url=jdbc:postgresql://localhost:5432/nome_do_seu_banco
-    spring.datasource.username=seu_usuario
-    spring.datasource.password=sua_senha
+spring.datasource.url=jdbc:postgresql://localhost:5432/nome_do_seu_banco
+spring.datasource.username=seu_usuario
+spring.datasource.password=sua_senha
 ```
 
 3. Instale as Dependências
@@ -178,8 +184,10 @@ Neste projeto, aprendi a...
 - Implementar restrições de unicidade composta no banco de dados com Unique Constraints;
 - Utilizar a Programação Orientada a Aspectos (AOP) para controle de limites de tráfego (Rate
   Limit);
-- Isolar o fluxo de arquivos binários (Multipart) do fluxo de dados JSON em rotas dedicadas;
+- Otimizar o upload de arquivos binários convertendo fluxos Multipart em estruturas de bytes;
 - Aplicar validações de dados com Bean Validation e Java Records;
 - Gerenciar o ciclo de vida de arquivos físicos integrado à persistência de dados;
 - Otimizar a escrita de código boilerplate utilizando o Lombok;
-- Configurar e gerenciar caches com o Caffeine Cache.
+- Configurar e gerenciar caches com o Caffeine Cache;
+- Aplicar o princípio de CQRS a nível de código para isolar fluxos de leitura e escrita;
+- Configurar o MapStruct para automatizar o mapeamento de entidades.
